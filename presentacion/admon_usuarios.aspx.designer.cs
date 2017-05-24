@@ -13,6 +13,24 @@ namespace presentacion {
     public partial class admon_usuarios {
         
         /// <summary>
+        /// Control div_tipos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl div_tipos;
+        
+        /// <summary>
+        /// Control ddltipousuarios.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddltipousuarios;
+        
+        /// <summary>
         /// Control lnkagregar.
         /// </summary>
         /// <remarks>

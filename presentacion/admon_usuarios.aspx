@@ -86,6 +86,12 @@
         <div class="col-lg-12">
             <h4 class="page-header">Administración de Usuarios</h4>
         </div>
+        <div class="col-lg-4" id="div_tipos" runat="server" visible="false">
+            <h5><strong><i class="fa fa-users" aria-hidden="true"></i>&nbsp;Filtro de Usuarios</strong></h5>
+            <asp:DropDownList ID="ddltipousuarios" CssClass="form-control" runat="server" AutoPostBack="true"
+                 OnSelectedIndexChanged="ddltipousuarios_SelectedIndexChanged"></asp:DropDownList>
+            <br />
+        </div>
         <div class="col-lg-12">
             
                     <asp:LinkButton ID="lnkagregar" OnClick="lnkagregar_Click"

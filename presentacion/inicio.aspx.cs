@@ -155,8 +155,9 @@ namespace presentacion
             {
                 int id_menu_padre = Request.QueryString["m"] == null ? 0 : Convert.ToInt32(funciones.de64aTexto(Request.QueryString["m"]));
                 bool admnistrador = Convert.ToBoolean(Session["administrador"]);
+                bool cliente = Convert.ToBoolean(Session["cliente"]);
                 MenuCOM menus = new MenuCOM();
-                DataSet ds = menus.ListadoMenus(id_menu_padre,admnistrador, filtro);
+                DataSet ds = menus.ListadoMenus(id_menu_padre,admnistrador, filtro, cliente);
                 DataTable dt_menus = ds.Tables[0];
                 if (dt_menus.Rows.Count > 0)
                 {

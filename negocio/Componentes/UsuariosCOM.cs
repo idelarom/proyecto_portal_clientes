@@ -356,13 +356,15 @@ namespace negocio.Componentes
             }
         }
 
-        public DataSet sp_catalogo_administracion_usuarios(int id_cliente,string usuario)
+        public DataSet sp_catalogo_administracion_usuarios(int id_cliente,string usuario, bool solo_clientes, bool solo_empleados)
         {
             DataSet ds = new DataSet();
             List<SqlParameter> listparameters = new List<SqlParameter>();
             listparameters.Add(new SqlParameter() { ParameterName = "@pid_cliente", SqlDbType = SqlDbType.Int, Value = id_cliente });
             listparameters.Add(new SqlParameter() { ParameterName = "@pusuario", SqlDbType = SqlDbType.Int, Value = usuario }); 
-             Datos data = new Datos();
+            listparameters.Add(new SqlParameter() { ParameterName = "@psolo_clientes", SqlDbType = SqlDbType.Int, Value = solo_clientes });
+            listparameters.Add(new SqlParameter() { ParameterName = "@psolo_empleados", SqlDbType = SqlDbType.Int, Value = solo_empleados });
+            Datos data = new Datos();
             try
             {
                 //ds = data.datos_Clientes(listparameters);

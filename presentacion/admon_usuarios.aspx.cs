@@ -16,12 +16,13 @@ namespace presentacion
                              "ModalShow('" + modalname + "');", true);
         }
 
-        private void CargarUsuarios()
+        private void CargarUsuarios(bool solo_clientes, bool solo_empleados)
         {
             try
             {
                 UsuariosCOM usuarios = new UsuariosCOM();
-                DataTable dt_roles = usuarios.sp_catalogo_administracion_usuarios(Convert.ToInt32(Session["id_cliente"]), Session["usuario"] as string).Tables[0];
+                DataTable dt_roles =
+                    usuarios.sp_catalogo_administracion_usuarios(Convert.ToInt32(Session["id_cliente"]), Session["usuario"] as string, solo_clientes, solo_empleados).Tables[0];
                 grid_usuarios.DataSource = dt_roles;
                 grid_usuarios.DataBind();
             }
@@ -143,7 +144,24 @@ namespace presentacion
         {
             if (!IsPostBack)
             {
-                CargarUsuarios();
+                bool cliente = Convert.ToBoolean(Session["cliente"]);
+                bool admin = Convert.ToBoolean(Session["administrador"]);
+                if (cliente)
+                {
+                    ddltipousuarios.Items.Insert(0, new ListItem("Clientes", "1"));
+                    CargarUsuarios(true, false);
+                }
+                else
+                {
+                    div_tipos.Visible = true;
+                    ddltipousuarios.Items.Insert(0, new ListItem("--Seleccione un Tipo de Usuario", "0"));
+                    ddltipousuarios.Items.Insert(1, new ListItem("Clientes", "1"));
+                    ddltipousuarios.Items.Insert(2, new ListItem("Empleados", "2"));
+                    if (admin) {
+
+                        ddltipousuarios.Items.Insert(3, new ListItem("Todos", "3"));
+                    }
+                }
             }
         }
 
@@ -255,6 +273,26 @@ namespace presentacion
             catch (Exception ex)
             {
                 Alert.ShowAlertError(ex.ToString(), this);
+            }
+        }
+
+        protected void ddltipousuarios_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int tipo = Convert.ToInt32(ddltipousuarios.SelectedValue);
+            switch (tipo)
+            {
+                //solo clientes
+                case 1:
+                    CargarUsuarios(true, false);
+                    break;
+                //solo empleados
+                case 2:
+                    CargarUsuarios(false, true);
+                    break;
+                //solo ambos
+                case 3:
+                    CargarUsuarios(false, false);
+                    break;
             }
         }
     }

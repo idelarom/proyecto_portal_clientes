@@ -1198,7 +1198,7 @@
                                 </div>
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;% Avance</strong></h5>
-                                    <telerik:RadTextBox ID="rtxtavanceentregable" runat="server" Skin="Bootstrap">
+                                    <telerik:RadTextBox ID="rtxtavanceentregable" runat="server" Skin="Bootstrap" InputType="Number">
                                         <ClientEvents OnKeyPress="keyPressInteger" />
                                     </telerik:RadTextBox>
                                 </div>
