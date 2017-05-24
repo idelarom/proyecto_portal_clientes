@@ -1387,7 +1387,7 @@ namespace presentacion
 
                     bool es_creador = Convert.ToBoolean(ViewState["es_creador"]);
                     bool administrador = Convert.ToBoolean(Session["administrador"]);
-                    lnkterminacíon.Visible = (es_creador || administrador);
+                    lnkterminacíon.Visible = ((es_creador || administrador) && !cliente);
                 }
             }
         }
