@@ -1894,11 +1894,29 @@
                             <div class="row" id="div_nombre_cliente" runat="server">
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-address-book-o" aria-hidden="true"></i>&nbsp;Contactos</strong>
-                                        <small>Seleccione uno o mas contactos</small>
+                                        <small>Seleccione uno o mas contactos&nbsp;</small>
+                                        <span>
+                                            <asp:LinkButton ID="lnkagregarnuevocontacto" CssClass="btn btn-primary btn-flat btn-xs" 
+                                                runat="server" OnClick="lnkagregarnuevocontacto_Click">
+                                                Agregar Nuevo Contacto</asp:LinkButton></span>
                                     </h5>
                                     <telerik:RadListBox Style="font-size: 10px" RenderMode="Lightweight" runat="server" ID="rdlcontacto_clientes" Height="100" Width="100%"
                                         OnItemDataBound="rdlcontacto_clientes_ItemDataBound" Skin="Bootstrap" SelectionMode="Multiple">
                                     </telerik:RadListBox>
+                                    <div id="div_addnewcontact" runat="server" visible="false">
+                                        <div class="col-lg-12">
+                                            <h5><strong>Nombre</strong></h5>
+                                            <telerik:RadTextBox ID="rtxtnombre_newcontact" Skin="Bootstrap" Width="100%" runat="server"></telerik:RadTextBox>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <h5><strong>Telefono</strong></h5>
+                                            <telerik:RadTextBox ID="rtxttelefeno_newcontact" Skin="Bootstrap" InputType="Number" Width="100%" runat="server"></telerik:RadTextBox>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-122">
+                                            <h5><strong>Correo</strong></h5>
+                                            <telerik:RadTextBox ID="rtxtcorreoo_newcontact" Skin="Bootstrap" Width="100%" InputType="Email" runat="server"></telerik:RadTextBox>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row" id="div_usuarios" runat="server" visible="false">

@@ -75,6 +75,8 @@ namespace datos.Modelos
 
         public bool terminado { get; set; }
 
+        public bool correo_bienvenida { get; set; }
+
         public DateTime fecha_registro { get; set; }
 
         [Required]

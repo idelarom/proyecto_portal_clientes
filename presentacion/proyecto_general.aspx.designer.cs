@@ -1624,6 +1624,15 @@ namespace presentacion {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl div_nombre_cliente;
         
         /// <summary>
+        /// Control lnkagregarnuevocontacto.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton lnkagregarnuevocontacto;
+        
+        /// <summary>
         /// Control rdlcontacto_clientes.
         /// </summary>
         /// <remarks>
@@ -1631,6 +1640,42 @@ namespace presentacion {
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::Telerik.Web.UI.RadListBox rdlcontacto_clientes;
+        
+        /// <summary>
+        /// Control div_addnewcontact.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl div_addnewcontact;
+        
+        /// <summary>
+        /// Control rtxtnombre_newcontact.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox rtxtnombre_newcontact;
+        
+        /// <summary>
+        /// Control rtxttelefeno_newcontact.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox rtxttelefeno_newcontact;
+        
+        /// <summary>
+        /// Control rtxtcorreoo_newcontact.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox rtxtcorreoo_newcontact;
         
         /// <summary>
         /// Control div_usuarios.

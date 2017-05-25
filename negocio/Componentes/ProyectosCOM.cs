@@ -87,6 +87,7 @@ namespace negocio.Componentes
                     proyecto.fecha_inicio = entidad.fecha_inicio;
                     proyecto.fecha_fin = entidad.fecha_fin;
                     proyecto.usuario_edicion = entidad.usuario_edicion;
+                    proyecto.correo_bienvenida = false;
                     context.SaveChanges();
                     return "";
                 }
@@ -131,7 +132,30 @@ namespace negocio.Componentes
                 return fullErrorMessage.ToString();
             }
         }
+        public string CorreoBienvenida(int id_proyecto)
+        {
+            try
+            {
+                Model context = new Model();
+                proyectos proyecto = context.proyectos
+                                .First(i => i.id_proyecto == id_proyecto);
+                proyecto.correo_bienvenida = true;
+                context.SaveChanges();
+                return "";
+            }
+            catch (DbEntityValidationException ex)
+            {
+                // Retrieve the error messages as a list of strings.
+                var errorMessages = ex.EntityValidationErrors
+                        .SelectMany(x => x.ValidationErrors)
+                        .Select(x => x.ErrorMessage);
 
+                // Join the list to a single string.
+                var fullErrorMessage = string.Join("; ", errorMessages);
+
+                return fullErrorMessage.ToString();
+            }
+        }
         public string EditarCharter(proyectos entidad)
         {
             try

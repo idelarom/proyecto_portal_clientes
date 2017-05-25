@@ -34,6 +34,8 @@ namespace datos.Modelos
 
         public bool only_admin { get; set; }
 
+        public bool? view_client { get; set; }
+
         public bool? borrado { get; set; }
     }
 }

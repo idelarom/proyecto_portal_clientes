@@ -130,7 +130,8 @@ namespace presentacion
                 if (dt.Rows.Count > 0)
                 {
                     DataRow row = dt.Rows[0];
-                    ViewState["es_creador"]=Convert.ToString(Session["usuario"]).ToUpper().Trim()== row["usuario"].ToString().Trim().ToUpper();
+                    ViewState["correo_bienvenida"] = Convert.ToBoolean(row["correo_bienvenida"]);
+                    ViewState["es_creador"] = Convert.ToString(Session["usuario"]).ToUpper().Trim() == row["usuario"].ToString().Trim().ToUpper();
                     lblproyect.Text = row["proyecto"].ToString();
                     lblfecha_inicio.Text = row["fecha_inicio_str"].ToString();
                     lblfecha_fin.Text = row["fecha_fin_str"].ToString();
@@ -259,7 +260,6 @@ namespace presentacion
                 proyectos_documentos entidad = new proyectos_documentos();
                 DataTable dt_entregables = componente.GetAll(id_proyecto);
 
-
                 repeater_documentos.DataSource = dt_entregables;
                 repeater_documentos.DataBind();
                 repeater_docs.DataSource = dt_entregables;
@@ -312,8 +312,6 @@ namespace presentacion
                     rgri_correos.DataSource = dt;
                     rgri_correos.DataBind();
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -671,7 +669,7 @@ namespace presentacion
                     vmensaje = ds.Tables[0].Rows[0]["mensaje"].ToString();
                     if (vmensaje == "")
                     {
-                        AgregarDocumento("archivo_principal_de_proyecto",archivo, file_name, ext, tamaño, contentType, true, false, false, false);
+                        AgregarDocumento("archivo_principal_de_proyecto", archivo, file_name, ext, tamaño, contentType, true, false, false, false);
                         string url = "proyecto_general.aspx?id_proyecto=" + Request.QueryString["id_proyecto"];
                         System.Web.UI.ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
                             "ModalClose();", true);
@@ -765,7 +763,7 @@ namespace presentacion
         /// <param name="contentType"></param>
         /// <param name="publico"></param>
         /// <returns></returns>
-        private String AgregarDocumento(string nombre,Byte[] archivo, string file_name, string ext, string tamaño, string contentType, bool publico, bool kit, bool doc_cierre, bool encuesta)
+        private String AgregarDocumento(string nombre, Byte[] archivo, string file_name, string ext, string tamaño, string contentType, bool publico, bool kit, bool doc_cierre, bool encuesta)
         {
             try
             {
@@ -942,10 +940,11 @@ namespace presentacion
                             "<p>El personal que realizo esta operación fue: <strong>" + remitente + "</strong>";
                         ds = correos.Enviar(entidad, cliente, informacion_adicional, proyecto, remitente, caso_de_envio);
                         break;
+
                     case 5:
-                        informacion_adicional = @" el proyecto <strong>" + proyecto.ToUpper().Trim() + " </strong>"+
-                            "ha sido terminado el <strong>"+DateTime.Now.ToString("dddd dd MMMM, yyyy hh:mm:ss:tt", CultureInfo.CreateSpecificCulture("es-MX")) + "</strong></p>" +
-                            "<p>Este movimiento fue realizado por <strong>" + remitente+ "</strong></p>";
+                        informacion_adicional = @" el proyecto <strong>" + proyecto.ToUpper().Trim() + " </strong>" +
+                            "ha sido terminado el <strong>" + DateTime.Now.ToString("dddd dd MMMM, yyyy hh:mm:ss:tt", CultureInfo.CreateSpecificCulture("es-MX")) + "</strong></p>" +
+                            "<p>Este movimiento fue realizado por <strong>" + remitente + "</strong></p>";
                         ds = correos.Enviar(entidad, cliente, informacion_adicional, proyecto, remitente, caso_de_envio);
                         break;
                 }
@@ -1351,6 +1350,8 @@ namespace presentacion
                     ViewState["dt_participantes"] = null;
                     ViewState["dt_empleados"] = null;
                     ViewState["dt_comidas"] = null;
+                    ViewState["es_creador"] = null;
+                    ViewState["correo_bienvenida"] = null;
                     ViewState["dt_contactos_original"] = null;
                     ViewState["dt_pendientes"] = null;
                     CargarProyectos(id_proyecto, usuario, Convert.ToBoolean(Session["administrador"]));
@@ -1743,7 +1744,7 @@ namespace presentacion
                     Stream fs = fupDocumentos.PostedFile.InputStream;
                     BinaryReader br = new BinaryReader(fs);
                     Byte[] archivo = br.ReadBytes((Int32)fs.Length);
-                    string vmensaje = AgregarDocumento("archivo_principal_de_proyecto",archivo, filename, ext, tamaño, contenttype, cbxpublico.Checked, false, false, false);
+                    string vmensaje = AgregarDocumento("archivo_principal_de_proyecto", archivo, filename, ext, tamaño, contenttype, cbxpublico.Checked, false, false, false);
                     if (vmensaje == "")
                     {
                         string url = "proyecto_general.aspx?tab=tdoc&id_proyecto=" + Request.QueryString["id_proyecto"];
@@ -2652,6 +2653,8 @@ namespace presentacion
             CargarTiposUsuarios(4);
             CargarListaClientes("");
             ddltipos_usuarios.Enabled = false;
+            div_addnewcontact.Visible = false;
+            rdlcontacto_clientes.Visible = true;
             if (idcliente > 0)
             {
                 ClientesCOM clientes = new ClientesCOM();
@@ -2711,10 +2714,6 @@ namespace presentacion
                 {
                     vmensaje = "La direccion del Cliente es necesaria.";
                 }
-                //else if (rtxtcliente_ocupacion.Text == "")
-                //{
-                //    vmensaje = "Es necesario una breve descripción de la ocupación del cliente.";
-                //}
                 else
                 {
                     proyectos entidad_p = new proyectos();
@@ -2727,24 +2726,56 @@ namespace presentacion
                         proyectos_clientes_contactos entidadballl = new proyectos_clientes_contactos();
                         entidadballl.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
                         entidadballl.usuario_borrado = Session["usuario"] as string;
-                        clientes.BorrarAll(entidadballl);
-                        IList<RadListBoxItem> collection = rdlcontacto_clientes.SelectedItems;
-                        foreach (RadListBoxItem item in collection)
+                        if (div_addnewcontact.Visible)
                         {
-                            int cvecontacto = Convert.ToInt32(item.Value);
-                            DataTable dt_contactos = clientes.ListadoContactos(Convert.ToInt32(rdlclientes.SelectedValue), cvecontacto).Tables[0];
-                            proyectos_clientes_contactos entidad = new proyectos_clientes_contactos();
-                            entidad.nombre = dt_contactos.Rows[0]["nombre_completo"].ToString();
-                            entidad.telefono = "";
-                            entidad.correo = dt_contactos.Rows[0]["email"].ToString();
-                            entidad.usuario = Session["usuario"] as string;
-                            entidad.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
-                            entidad.CveContacto = cvecontacto;
-                            vmensaje = clientes.Exist(entidad) ? "" : clientes.AgregarContacto(entidad);
-                            if (vmensaje != "") { break; }
+                            if (rtxtnombre_newcontact.Text.Trim() == "")
+                            {
+                                vmensaje = "Ingrese el nombre del nuevo contacto";
+                            }
+                            else if (rtxttelefeno_newcontact.Text.Trim() == "")
+                            {
+                                vmensaje = "Ingrese el telefono del nuevo contacto";
+                            }
+                            else if (rtxtcorreoo_newcontact.Text.Trim() == "")
+                            {
+                                vmensaje = "Ingrese el correo del nuevo contacto";
+                            }
+                            else
+                            {
+                                proyectos_clientes_contactos entidad = new proyectos_clientes_contactos();
+                                entidad.nombre = rtxtnombre_newcontact.Text.Trim(); ;
+                                entidad.telefono = rtxttelefeno_newcontact.Text.Trim();
+                                entidad.correo = rtxtcorreoo_newcontact.Text.Trim();
+                                entidad.usuario = Session["usuario"] as string;
+                                entidad.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
+                                entidad.CveContacto = null;
+                                vmensaje = clientes.Exist(entidad) ? "" : clientes.AgregarContacto(entidad);
+                            }
+                        }
+                        else
+                        {
+                            IList<RadListBoxItem> collection = rdlcontacto_clientes.SelectedItems;
+                            if (collection.Count > 0)
+                            {
+                                clientes.BorrarAll(entidadballl);
+                                foreach (RadListBoxItem item in collection)
+                                {
+                                    int cvecontacto = Convert.ToInt32(item.Value);
+                                    DataTable dt_contactos = clientes.ListadoContactos(Convert.ToInt32(rdlclientes.SelectedValue), cvecontacto).Tables[0];
+                                    proyectos_clientes_contactos entidad = new proyectos_clientes_contactos();
+                                    entidad.nombre = dt_contactos.Rows[0]["nombre_completo"].ToString();
+                                    entidad.telefono = "";
+                                    entidad.correo = dt_contactos.Rows[0]["email"].ToString();
+                                    entidad.usuario = Session["usuario"] as string;
+                                    entidad.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
+                                    entidad.CveContacto = cvecontacto;
+                                    vmensaje = clientes.Exist(entidad) ? "" : clientes.AgregarContacto(entidad);
+                                    if (vmensaje != "") { break; }
+                                }
+                            }
                         }
                     }
-                    if (div_usuarios.Visible)
+                    if (div_usuarios.Visible && vmensaje == "")
                     {
                         usuarios entidad = new usuarios();
                         entidad.id_cliente = Convert.ToInt32(rdlclientes.SelectedValue);
@@ -2761,7 +2792,13 @@ namespace presentacion
                     hdfid_cliente.Value = rdlclientes.SelectedValue.Trim();
                     CargarCorreosCliente();
                     string correos_clientes = Session["correo_clientes"] as string;
-                    EnviarCorreo(correos_clientes, "Asignación de Nuevo Proyecto", "", 2);
+                    Boolean correo_bienvenida = Convert.ToBoolean(ViewState["correo_bienvenida"]);
+                    if (!correo_bienvenida)
+                    {
+                        ProyectosCOM proyects = new ProyectosCOM();
+                        proyects.CorreoBienvenida(Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"])));
+                        EnviarCorreo(correos_clientes, "Asignación de Nuevo Proyecto", "", 2);
+                    }
                     string url = "proyecto_general.aspx?id_proyecto=" + Request.QueryString["id_proyecto"];
                     ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
                         "AlertGO('Información del Cliente Guardada Correctamente', '" + url + "');", true);
@@ -2952,7 +2989,7 @@ namespace presentacion
                         {
                             vmensaje = "Seleccione un documento para la encuesta";
                             break;
-                        }             
+                        }
                         name = dirInfo + randomNumber.Trim() + "csv_" + date + Path.GetExtension(fupencuestas.FileName);
                         funciones.UploadFile(fupencuestas, name.Trim(), this.Page);
                         filePath = name;
@@ -2963,12 +3000,15 @@ namespace presentacion
                         fs = fupencuestas.PostedFile.InputStream;
                         br = new BinaryReader(fs);
                         archivo = br.ReadBytes((Int32)fs.Length);
-                        if (id_documento_encuesta > 0) { 
-                        entidad.id_documento = id_documento_encuesta;
-                        entidad.usuario_borrado = Session["usuario"] as string;
-                        entidad.comentarios_borrado = "Borrado por actualizacion";
-                        documentos.Borrar(entidad);}
+                        if (id_documento_encuesta > 0)
+                        {
+                            entidad.id_documento = id_documento_encuesta;
+                            entidad.usuario_borrado = Session["usuario"] as string;
+                            entidad.comentarios_borrado = "Borrado por actualizacion";
+                            documentos.Borrar(entidad);
+                        }
                         break;
+
                     case "cierre":
                         if (!cierre)
                         {
@@ -2993,6 +3033,7 @@ namespace presentacion
                             documentos.Borrar(entidad);
                         }
                         break;
+
                     case "kit":
                         if (!kit)
                         {
@@ -3020,17 +3061,17 @@ namespace presentacion
                 }
                 if (vmensaje == "")
                 {
-                    AgregarDocumento("documento_de_"+command,archivo,filename,ext,tamaño,contenttype,true,kit,cierre,encuestas);
+                    AgregarDocumento("documento_de_" + command, archivo, filename, ext, tamaño, contenttype, true, kit, cierre, encuestas);
                 }
 
                 if (vmensaje == "")
                 {
                     ValidarDocumentaciónCierre();
-                    Alert.ShowAlert("Documento Guardado Correctamente","Mensaje del Sistema",this);
+                    Alert.ShowAlert("Documento Guardado Correctamente", "Mensaje del Sistema", this);
                     ModalShow("#myModalTerminacion");
                 }
-                else {
-
+                else
+                {
                     lblerrorterminacion.Text = vmensaje;
                     div_errorterminacion.Visible = true;
                     ModalShow("#myModalTerminacion");
@@ -3082,6 +3123,7 @@ namespace presentacion
             {
             }
         }
+
         private String TerminarProyecto(decimal costo_real, decimal valor_ganado)
         {
             div_okencuesta.Visible = false;
@@ -3119,10 +3161,8 @@ namespace presentacion
 
         #endregion EVENTOS
 
-
         protected void lnkguardarempleado_Click1(object sender, EventArgs e)
         {
-            
         }
 
         protected void lnkterminaproyecto_Click(object sender, EventArgs e)
@@ -3131,9 +3171,9 @@ namespace presentacion
             try
             {
                 string vmensaje = "";
-                double costor=0;
+                double costor = 0;
                 bool costor_isdouble = Double.TryParse(rtxtcostoreal.Text.Trim(), out costor);
-                double valorg= 0;
+                double valorg = 0;
                 bool valorganadoisdouble = Double.TryParse(rtxtvalorganado.Text.Trim(), out valorg);
 
                 if (!costor_isdouble)
@@ -3146,7 +3186,7 @@ namespace presentacion
                 }
                 if (vmensaje == "")
                 {
-                    vmensaje = TerminarProyecto(Convert.ToDecimal(costor),Convert.ToDecimal(valorg));
+                    vmensaje = TerminarProyecto(Convert.ToDecimal(costor), Convert.ToDecimal(valorg));
                 }
 
                 if (vmensaje == "")
@@ -3162,7 +3202,7 @@ namespace presentacion
                     string correos_pm = Session["correo_pm"] as string;
                     CargarCorreosCliente();
                     string correos_clientes = Session["correo_clientes"] as string;
-                    EnviarCorreo(correos_clientes+ correos_pm, "Terminación de Proyecto", "", 5);
+                    EnviarCorreo(correos_clientes + correos_pm, "Terminación de Proyecto", "", 5);
                     string url = "inicio.aspx";
                     ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
                         "AlertGO('Proyecto Terminado Correctamente.', '" + url + "');", true);
@@ -3189,15 +3229,23 @@ namespace presentacion
                     div_cargacierre.Visible = true;
                     div_okcierre.Visible = false;
                     break;
+
                 case "encuesta":
                     div_cargaencuesta.Visible = true;
                     div_okencuesta.Visible = false;
                     break;
+
                 case "kit":
                     div_cargakit.Visible = true;
                     div_okkit.Visible = false;
                     break;
             }
+        }
+
+        protected void lnkagregarnuevocontacto_Click(object sender, EventArgs e)
+        {
+            rdlcontacto_clientes.Visible = !rdlcontacto_clientes.Visible;
+            div_addnewcontact.Visible = !div_addnewcontact.Visible;
         }
     }
 }

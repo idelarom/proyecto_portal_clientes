@@ -182,7 +182,7 @@ namespace negocio.Componentes
                 Model context = new Model();
                 proyectos_clientes_contactos tarea = context.proyectos_clientes_contactos
                                 .First(i => i.id_proyecto == entidad.id_proyecto
-                                 && i.CveContacto == entidad.CveContacto);
+                                 && i.id_pcontacto == entidad.id_pcontacto);
                 tarea.fecha_borrado = DateTime.Now;
                 tarea.comentarios_borrado = entidad.comentarios_borrado;
                 tarea.usuario_borrado = entidad.usuario_borrado;
@@ -208,9 +208,10 @@ namespace negocio.Componentes
             try
             {
                 DataTable dt_tareas = Get(entidad);
-                foreach (DataRow tarea in dt_tareas.Rows)
+                DataTable dt = dt_tareas.Select("not cvecontacto is null").CopyToDataTable();
+                foreach (DataRow tarea in dt.Rows)
                 {
-                    entidad.CveContacto = Convert.ToInt32(tarea["CveContacto"]);
+                    entidad.id_pcontacto = Convert.ToInt32(tarea["id_pcontacto"]);
                     entidad.id_proyecto = Convert.ToInt32(tarea["id_proyecto"]);
                     entidad.comentarios_borrado = "borrado por actualizacion";
                     Borrar(entidad);
