@@ -1744,7 +1744,7 @@ namespace presentacion
                     Stream fs = fupDocumentos.PostedFile.InputStream;
                     BinaryReader br = new BinaryReader(fs);
                     Byte[] archivo = br.ReadBytes((Int32)fs.Length);
-                    string vmensaje = AgregarDocumento("archivo_principal_de_proyecto", archivo, filename, ext, tamaño, contenttype, cbxpublico.Checked, false, false, false);
+                    string vmensaje = AgregarDocumento(filename.Replace(ext,""), archivo, filename, ext, tamaño, contenttype, cbxpublico.Checked, false, false, false);
                     if (vmensaje == "")
                     {
                         string url = "proyecto_general.aspx?tab=tdoc&id_proyecto=" + Request.QueryString["id_proyecto"];
