@@ -208,13 +208,16 @@ namespace negocio.Componentes
             try
             {
                 DataTable dt_tareas = Get(entidad);
-                DataTable dt = dt_tareas.Select("not cvecontacto is null").CopyToDataTable();
-                foreach (DataRow tarea in dt.Rows)
+                if (dt_tareas.Rows.Count > 0)
                 {
-                    entidad.id_pcontacto = Convert.ToInt32(tarea["id_pcontacto"]);
-                    entidad.id_proyecto = Convert.ToInt32(tarea["id_proyecto"]);
-                    entidad.comentarios_borrado = "borrado por actualizacion";
-                    Borrar(entidad);
+                    DataTable dt = dt_tareas.Select("not cvecontacto is null").CopyToDataTable();
+                    foreach (DataRow tarea in dt.Rows)
+                    {
+                        entidad.id_pcontacto = Convert.ToInt32(tarea["id_pcontacto"]);
+                        entidad.id_proyecto = Convert.ToInt32(tarea["id_proyecto"]);
+                        entidad.comentarios_borrado = "borrado por actualizacion";
+                        Borrar(entidad);
+                    }
                 }
                 return true;
             }

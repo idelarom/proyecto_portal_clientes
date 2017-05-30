@@ -604,6 +604,7 @@ namespace presentacion
                 ent2.usuario_borrado = Session["usuario"] as string;
                 if (dt.Rows.Count > 0 && componente2.BorrarAll(ent2))
                 {
+                    bool isEnglish = funciones.Format(dt);
                     string vmensaje = "";
                     foreach (DataRow row in dt.Rows)
                     {
@@ -617,9 +618,9 @@ namespace presentacion
                                 entidad.proyecto = row["NOMBRE"].ToString().Trim();
                                 entidad.descripcion = rtxtdescripcion.Text == "" ? row["NOMBRE"].ToString().Trim() : rtxtdescripcion.Text;
                                 entidad.duración = row["DURACIÓN"].ToString().Trim(); ;
-                                entidad.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim()));
+                                entidad.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim(), isEnglish));
                                 entidad.fecha_inicio_str = Convert.ToDateTime(entidad.fecha_inicio).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
-                                entidad.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim()));
+                                entidad.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim(), isEnglish));
                                 entidad.fecha_fin_str = Convert.ToDateTime(entidad.fecha_inicio).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
 
                                 entidad.usuario_edicion = Session["usuario"] as string;
@@ -642,9 +643,9 @@ namespace presentacion
                                 entidad_tarea.codigo_tarea = row["ID"].ToString().Trim();
                                 entidad_tarea.tarea = row["NOMBRE"].ToString().Trim();
                                 entidad_tarea.duración = row["DURACIÓN"].ToString().Trim();
-                                entidad_tarea.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim()));
+                                entidad_tarea.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim(), isEnglish));
                                 entidad_tarea.fecha_inicio_str = Convert.ToDateTime(entidad_tarea.fecha_inicio).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
-                                entidad_tarea.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim()));
+                                entidad_tarea.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim(), isEnglish));
                                 entidad_tarea.fecha_fin_str = Convert.ToDateTime(entidad_tarea.fecha_fin).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
                                 entidad_tarea.avance = Convert.ToByte(row["Porcentaje_completado"].ToString().Replace("%", "").Trim() == "" ? "0" : row["Porcentaje_completado"].ToString().Replace("%", "").Trim());
                                 entidad_tarea.recursos = row["Nombres_de_los_recursos"].ToString().Trim(); ;
@@ -2686,7 +2687,15 @@ namespace presentacion
             try
             {
                 string vmensaje = "";
-                if (rdlclientes.SelectedItems.Count == 0)
+                usuarios entidad_usuarios = new usuarios();
+                entidad_usuarios.usuario = rtxtusuario.Text;
+                UsuariosCOM usuarios_check = new UsuariosCOM();
+                if (div_usuarios.Visible && usuarios_check.GetExists(entidad_usuarios).Rows.Count > 0)
+                {
+
+                    vmensaje = "Ya existe un usuario llamado: "+rtxtusuario.Text;
+                }
+                else if (rdlclientes.SelectedItems.Count == 0)
                 {
                     vmensaje = "Seleccione un cliente";
                 }
@@ -2720,7 +2729,8 @@ namespace presentacion
                     entidad_p.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
                     entidad_p.id_cliente = Convert.ToInt32(rdlclientes.SelectedValue);
                     ClientesCOM clientes = new ClientesCOM();
-                    vmensaje = clientes.RelacionarAProyecto(entidad_p);
+                   
+                        vmensaje = clientes.RelacionarAProyecto(entidad_p);
                     if (vmensaje == "")
                     {
                         proyectos_clientes_contactos entidadballl = new proyectos_clientes_contactos();
@@ -2752,26 +2762,23 @@ namespace presentacion
                                 vmensaje = clientes.Exist(entidad) ? "" : clientes.AgregarContacto(entidad);
                             }
                         }
-                        else
+                        IList<RadListBoxItem> collection = rdlcontacto_clientes.SelectedItems;
+                        if (collection.Count > 0)
                         {
-                            IList<RadListBoxItem> collection = rdlcontacto_clientes.SelectedItems;
-                            if (collection.Count > 0)
+                            clientes.BorrarAll(entidadballl);
+                            foreach (RadListBoxItem item in collection)
                             {
-                                clientes.BorrarAll(entidadballl);
-                                foreach (RadListBoxItem item in collection)
-                                {
-                                    int cvecontacto = Convert.ToInt32(item.Value);
-                                    DataTable dt_contactos = clientes.ListadoContactos(Convert.ToInt32(rdlclientes.SelectedValue), cvecontacto).Tables[0];
-                                    proyectos_clientes_contactos entidad = new proyectos_clientes_contactos();
-                                    entidad.nombre = dt_contactos.Rows[0]["nombre_completo"].ToString();
-                                    entidad.telefono = "";
-                                    entidad.correo = dt_contactos.Rows[0]["email"].ToString();
-                                    entidad.usuario = Session["usuario"] as string;
-                                    entidad.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
-                                    entidad.CveContacto = cvecontacto;
-                                    vmensaje = clientes.Exist(entidad) ? "" : clientes.AgregarContacto(entidad);
-                                    if (vmensaje != "") { break; }
-                                }
+                                int cvecontacto = Convert.ToInt32(item.Value);
+                                DataTable dt_contactos = clientes.ListadoContactos(Convert.ToInt32(rdlclientes.SelectedValue), cvecontacto).Tables[0];
+                                proyectos_clientes_contactos entidad = new proyectos_clientes_contactos();
+                                entidad.nombre = dt_contactos.Rows[0]["nombre_completo"].ToString();
+                                entidad.telefono = "";
+                                entidad.correo = dt_contactos.Rows[0]["email"].ToString();
+                                entidad.usuario = Session["usuario"] as string;
+                                entidad.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
+                                entidad.CveContacto = cvecontacto;
+                                vmensaje = clientes.Exist(entidad) ? "" : clientes.AgregarContacto(entidad);
+                                if (vmensaje != "") { break; }
                             }
                         }
                     }

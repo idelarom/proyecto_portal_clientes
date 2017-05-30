@@ -1786,9 +1786,7 @@
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <h5><strong><i class="fa fa-phone" aria-hidden="true"></i>&nbsp;Telefono</strong></h5>
-                                    <telerik:RadTextBox ID="rtxttelefonoinvo" runat="server" Skin="Bootstrap" Width="100%" InputType="Number">
-
-                                        <ClientEvents OnKeyPress="keyPressInteger" />
+                                    <telerik:RadTextBox ID="rtxttelefonoinvo" runat="server" Skin="Bootstrap" Width="100%">
                                     </telerik:RadTextBox>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
@@ -1812,11 +1810,11 @@
                                 </asp:UpdatePanel>
                             </div>
                             <div class="row">
-                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
                                     <h5><strong><i class="fa fa-briefcase" aria-hidden="true"></i>&nbsp;Rol del Involucrado</strong></h5>
                                     <asp:DropDownList ID="ddlrol" CssClass="form-control" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlrol_SelectedIndexChanged"></asp:DropDownList>
                                 </div>
-                                <div class="col-lg-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
 
                                     <h5><strong><i class="fa fa-briefcase" aria-hidden="true"></i>&nbsp;Responsabilidades</strong></h5>
                                     <asp:TextBox ID="txtresponsabilidades" ReadOnly="true" TextMode="MultiLine" Rows="2" CssClass="form-control" Width="100%" runat="server"></asp:TextBox>

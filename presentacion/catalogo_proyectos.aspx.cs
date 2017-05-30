@@ -221,6 +221,7 @@ namespace presentacion
                 int id_proyect = 0;
                 if (dt.Rows.Count > 0)
                 {
+                    bool isEnglish = funciones.Format(dt);
                     string vmensaje = "";
                     foreach (DataRow row in dt.Rows)
                     {
@@ -236,9 +237,9 @@ namespace presentacion
                                 entidad.codigo_proyecto = row["ID"].ToString().Trim();
                                 entidad.proyecto = row["NOMBRE"].ToString().Trim();
                                 entidad.duración = row["DURACIÓN"].ToString().Trim();
-                                entidad.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim()));
+                                entidad.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim(), isEnglish));
                                 entidad.fecha_inicio_str = Convert.ToDateTime(entidad.fecha_inicio).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
-                                entidad.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim()));
+                                entidad.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim(), isEnglish));
                                 entidad.fecha_fin_str = Convert.ToDateTime(entidad.fecha_fin).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
                                 entidad.usuario = Session["usuario"] as string;
                                 entidad.avance = Convert.ToByte(row["Porcentaje_completado"].ToString().Replace("%", "").Trim() == "" ? "0" : row["Porcentaje_completado"].ToString().Replace("%", "").Trim());
@@ -278,9 +279,9 @@ namespace presentacion
                                 entidad2.codigo_tarea = row["ID"].ToString().Trim();
                                 entidad2.tarea = row["NOMBRE"].ToString().Trim();
                                 entidad2.duración = row["DURACIÓN"].ToString().Trim();
-                                entidad2.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim()));
+                                entidad2.fecha_inicio = Convert.ToDateTime(funciones.RetunrFirmatDate(row["COMIENZO"].ToString().Trim(), isEnglish));
                                 entidad2.fecha_inicio_str = Convert.ToDateTime(entidad2.fecha_inicio).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
-                                entidad2.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim()));
+                                entidad2.fecha_fin = Convert.ToDateTime(funciones.RetunrFirmatDate(row["FIN"].ToString().Trim(), isEnglish));
                                 entidad2.fecha_fin_str = Convert.ToDateTime(entidad2.fecha_fin).ToString("dddd dd MMMM, yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
                                 entidad2.usuario = Session["usuario"] as string;
                                 entidad2.avance = Convert.ToByte(row["Porcentaje_completado"].ToString().Replace("%", "").Trim() == "" ? "0" : row["Porcentaje_completado"].ToString().Replace("%", "").Trim());

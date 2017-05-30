@@ -93,7 +93,29 @@ namespace presentacion
             }
         }
 
-        public static String RetunrFirmatDate(string datestr)
+        public static Boolean Format(DataTable dt)
+        {
+            bool isEnglish = false;
+            foreach (DataRow row in dt.Rows)
+            {
+                string COMIENZO = RetunrFirmatDate(row["COMIENZO"].ToString(),false);
+                string FIN = RetunrFirmatDate(row["FIN"].ToString(),false);
+                string value = COMIENZO.Split('/')[1];
+                string value2 = FIN.Split('/')[1];
+                if (Convert.ToInt32(value) > 12) {
+                    isEnglish = true;
+                    break;
+                }
+                if (Convert.ToInt32(value2) > 12)
+                {
+                    isEnglish = true;
+                    break;
+                }
+            }
+            return isEnglish;
+        }
+
+        public static String RetunrFirmatDate(string datestr, bool isEnglish)
         {
             try
             {
@@ -104,6 +126,27 @@ namespace presentacion
                 datestr = datestr.Replace("vie ", "");
                 datestr = datestr.Replace("sab ", "");
                 datestr = datestr.Replace("dom ", "");
+                datestr = datestr.Replace("mon ", "");
+                datestr = datestr.Replace("tue ", "");
+                datestr = datestr.Replace("wed ", "");
+                datestr = datestr.Replace("thu ", "");
+                datestr = datestr.Replace("fri ", "");
+                datestr = datestr.Replace("sat ", "");
+                datestr = datestr.Replace("sun ", "");
+                datestr = datestr.Replace("monday ", "");
+                datestr = datestr.Replace("tuesday ", "");
+                datestr = datestr.Replace("wednesday ", "");
+                datestr = datestr.Replace("thursday ", "");
+                datestr = datestr.Replace("friday ", "");
+                datestr = datestr.Replace("saturday ", "");
+                datestr = datestr.Replace("sunday ", "");
+                if (isEnglish)
+                {
+                    string[] cadena = datestr.Split('/');
+                    string nee_date = cadena[1] + "/" + cadena[0] + "/" + cadena[2];
+                    datestr = nee_date;
+                }
+
                 string year_today = datestr.Substring(datestr.Length - 3);
                 string caracter = year_today.Substring(0, 1);
                 if (caracter == "/")
