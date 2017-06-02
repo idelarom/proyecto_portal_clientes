@@ -58,19 +58,19 @@ namespace datos.Modelos
         [StringLength(250)]
         public string fecha_fin_str { get; set; }
 
-        [StringLength(1000)]
+        [StringLength(8000)]
         public string objetivos { get; set; }
 
-        [StringLength(1000)]
+        [StringLength(8000)]
         public string descripcion_solucion { get; set; }
 
-        [StringLength(1000)]
+        [StringLength(8000)]
         public string supuestos { get; set; }
 
-        [StringLength(1000)]
+        [StringLength(8000)]
         public string fuera_alcance { get; set; }
 
-        [StringLength(1000)]
+        [StringLength(8000)]
         public string riesgos_alto_nivel { get; set; }
 
         public bool terminado { get; set; }

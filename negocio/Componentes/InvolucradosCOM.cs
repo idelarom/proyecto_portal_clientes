@@ -1,5 +1,6 @@
 ﻿using datos;
 using datos.Modelos;
+using datos.NAVISION;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,18 +16,50 @@ namespace negocio.Componentes
         {
             try
             {
+                string vmensaje = "";
                 Model context = new Model();
-                proyectos_empleados empleado = new proyectos_empleados
+                if (!ExistPM(entidad))
                 {
-                    id_proyecto = entidad.id_proyecto,
-                    no_ = entidad.no_,
-                    creador = entidad.creador,
-                    usuario = entidad.usuario,
-                    fecha = DateTime.Now
-                };
-                context.proyectos_empleados.Add(empleado);
-                context.SaveChanges();
-                return "";
+                    proyectos_empleados empleado = new proyectos_empleados
+                    {
+                        id_proyecto = entidad.id_proyecto,
+                        no_ = entidad.no_,
+                        creador = entidad.creador,
+                        usuario = entidad.usuario,
+                        fecha = DateTime.Now
+                    };
+                    context.proyectos_empleados.Add(empleado);
+                    usuarios entidadus = new usuarios();
+                    entidadus.id_cliente = null;
+                    entidadus.id_uperfil = 3;
+                    EmpleadosCOM empleados_com = new EmpleadosCOM();
+                    Employee enti = new Employee();
+                    DataTable dt_empleados = empleados_com.Get(enti);
+                    int no_ = entidad.no_;
+                    if (dt_empleados.Select("no_ = " + no_.ToString().Trim() + "").Length > 0)
+                    {
+
+                        DataTable dt_filter = dt_empleados.Select("no_ = " + no_.ToString().Trim() + "").CopyToDataTable();
+                        if (dt_filter.Rows.Count > 0)
+                        {
+                            entidadus.usuario = dt_filter.Rows[0]["Usuario_Red"].ToString().ToUpper();
+                            entidadus.password = "";
+                            UsuariosCOM pusuarios = new UsuariosCOM();
+                            vmensaje = entidadus.usuario == "" ? "El empleado no cuenta con usuario de red." : pusuarios.Agregar(entidadus)[0];
+                        }
+                    }
+                    else
+                    {
+                        vmensaje = "No se encontraron los datos completos del empleado. Favor de verificar con el departamento correspondiente, que la información del empleado este completa.";
+                    }
+
+
+                    if (vmensaje == "")
+                    {
+                        context.SaveChanges();
+                    }
+                }
+                return vmensaje;
             }
             catch (DbEntityValidationException ex)
             {

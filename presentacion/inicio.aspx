@@ -77,10 +77,9 @@
                             <thead>
                                 <tr>
                                     <th>Proyecto</th>
-                                    <th>Planeación</th>
-                                    <th>Diseño</th>
-                                    <th>Ejecución</th>
-                                    <th>Cierre</th>
+                                    <th style="text-align: center;">Planeación</th>
+                                    <th style="text-align: center;">Ejecución</th>
+                                    <th style="text-align: center;">Cierre</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,7 +88,6 @@
                                         <tr>
                                             <td><a href='<%# "proyecto_general.aspx?id_proyecto="+ presentacion.funciones.deTextoa64(Eval("id_proyecto").ToString()) %>'><%# Eval("proyecto") %></a></td>
                                             <td style="text-align: center;"><%# Eval("Planeación") %></td>
-                                            <td style="text-align: center;"><%# Eval("Diseño") %></td>
                                             <td style="text-align: center;"><%# Eval("Ejecución") %></td>
                                             <td style="text-align: center;"><%# Eval("Cierre") %></td>
                                         </tr>

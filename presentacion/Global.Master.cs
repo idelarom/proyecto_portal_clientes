@@ -30,10 +30,8 @@ namespace presentacion
                 date = date.Replace("/", "_");
                 date = date.Replace(":", "_");
                 date = date.Replace(" ", "");
-                string url = System.Configuration.ConfigurationManager.AppSettings["server"] + "\\img\\user.png?date=" + date;
-                imguser.ImageUrl = url;
-                imguser2.ImageUrl = url;
-                imguser3.ImageUrl = url;
+                string url = "/"+System.Configuration.ConfigurationManager.AppSettings["server"] + "/img/user.png?date=" + date;
+              
             }
         }
 

@@ -125,15 +125,16 @@ namespace negocio.Componentes
                                     u.FechaAutoriza,
                                     u.MotivoModificacion,
                                     u.TipoBaja,
-                                    u.ActivoFijo
+                                    u.ActivoFijo,
+                                    nombre_completo =(u.First_Name.Trim()  +" "+ u.Last_Name.Trim() )
                                 })
                                 .OrderBy(u => u.First_Name);
                 dt = To.DataTable(query.ToList());
-                dt.Columns.Add("nombre_completo");
-                foreach (DataRow row in dt.Rows)
-                {
-                    row["nombre_completo"] = row["First_Name"].ToString().Trim() + " " + row["Last_Name"].ToString().Trim();
-                }
+                //dt.Columns.Add("nombre_completo");
+                //foreach (DataRow row in dt.Rows)
+                //{
+                //    row["nombre_completo"] = row["First_Name"].ToString().Trim() + " " + row["Last_Name"].ToString().Trim();
+                //}
                 return dt;
             }
             catch (Exception ex)

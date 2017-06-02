@@ -118,7 +118,15 @@
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
     <script type="text/javascript">
-
+        function LoadPage()
+        {            
+            $("#div_load").show();
+            $("#div_content").hide();
+        }
+        function LoadPageHide() {
+            $("#div_load").hide();
+            $("#div_content").show();
+        }
         function keyPressInteger(sender, args) {
             var text = sender.get_value() + args.get_keyCharacter();
             if (!text.match('^[0-9]+$'))
@@ -142,10 +150,13 @@
         }
 
         function ModalShow(modal) {
+            LoadPageHide();
             $(modal).modal('show');
             return true;
         }
-
+        function ModalCloseGlobal(modal) {
+            $(modal).modal('hide');
+        }
         //VALIDA QUE SOLO SEAN NUMEROS ENTEROS REALES
         function validarEnteros(e) {
             k = (document.all) ? e.keyCode : e.which;
@@ -195,7 +206,7 @@
                             <!-- User Account: style can be found in dropdown.less -->
                             <li class="dropdown user user-menu">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <asp:Image ID="imguser" runat="server" class="user-image" Visible="true" />
+                                    <asp:Image ID="imguser" runat="server" class="user-image" Visible="true"  ImageUrl="~/img/user.png" />
                                     <span class="hidden-xs">
                                         <asp:Label ID="lblname" runat="server" Text="Label"></asp:Label></span>
                                 </a>
@@ -249,11 +260,17 @@
                 </section>
                 <!-- /.sidebar -->
             </aside>
-
             <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">
                 <telerik:RadScriptManager ID="RadScriptManager1" runat="server"></telerik:RadScriptManager>
-                <div class="content">
+
+                <div id="div_load" runat="server" style="display: none; position: fixed; left: 0px; top: 30%; width: 100%; height: 100%; z-index: 9999;">
+                    <asp:Image ID="idid" Style="display: block; margin: 0 auto;"
+                        runat="server" ImageUrl="~/img/loading_2.gif" />
+                    <h3 style="text-align: center;">Cargando Información</h3>
+                </div>
+                <div class="content" id="div_content" runat="server">
+
                     <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
                     </asp:ContentPlaceHolder>
                 </div>

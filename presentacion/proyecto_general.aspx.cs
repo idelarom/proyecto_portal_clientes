@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Web;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using Telerik.Web.UI;
 
@@ -166,6 +168,7 @@ namespace presentacion
                     else
                     {
                     }
+                    //CargarListadoEmpleados("");
                     CargarComboRoles();
                     CargarEntregables(id_proyecto);
                     CargarDocumentos(id_proyecto);
@@ -174,6 +177,7 @@ namespace presentacion
                     CargarMinutas(id_proyecto);
                     CargarInvolucrado(id_proyecto);
                     CargarEmpleadosProyecto(id_proyecto);
+                    CargarGrafica(id_proyecto);
                 }
                 else
                 {
@@ -439,7 +443,7 @@ namespace presentacion
                 {
                     entidad.entregable = rtxtentregable.Text;
                     entidad.fecha = rdtfechaentregable.SelectedDate.Value;
-                    entidad.avance = Convert.ToByte(rtxtavanceentregable.Text);
+                    entidad.avance = Convert.ToByte((rtxtavanceentregable.Text==""|| rtxtavanceentregable.Text=="0"?"1": rtxtavanceentregable.Text));
                     entidad.usuario = Session["usuario"] as string;
                     string[] return_array = entregables.Agregar(entidad);
                     vmensaje = return_array[0];
@@ -917,7 +921,7 @@ namespace presentacion
                         ds = correos.Enviar(entidad, cliente, informacion_adicional, proyecto, remitente, caso_de_envio);
 
                         break;
-                    //se agr ego involucrado
+                    //se agrego involucrado
                     case 4:
                         InvolucradosCOM involucraods = new InvolucradosCOM();
                         DataSet ds_ = involucraods.sp_arbol_involucradosall(Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"])), false);
@@ -946,6 +950,11 @@ namespace presentacion
                         informacion_adicional = @" el proyecto <strong>" + proyecto.ToUpper().Trim() + " </strong>" +
                             "ha sido terminado el <strong>" + DateTime.Now.ToString("dddd dd MMMM, yyyy hh:mm:ss:tt", CultureInfo.CreateSpecificCulture("es-MX")) + "</strong></p>" +
                             "<p>Este movimiento fue realizado por <strong>" + remitente + "</strong></p>";
+                        ds = correos.Enviar(entidad, cliente, informacion_adicional, proyecto, remitente, caso_de_envio);
+                        break;
+                    case 6:
+                        informacion_adicional = @"usted ha sido relacionado  al proyecto <strong>" + proyecto.ToUpper().Trim() + " </strong>" +
+                             "<p>Este movimiento fue realizado por <strong>" + remitente + "</strong></p>";
                         ds = correos.Enviar(entidad, cliente, informacion_adicional, proyecto, remitente, caso_de_envio);
                         break;
                 }
@@ -1223,7 +1232,18 @@ namespace presentacion
                 Employee entidad = new Employee();
                 EmpleadosCOM empleados = new EmpleadosCOM();
                 DataTable dt_original = empleados.Get(entidad);
-                DataTable dt = filtro == "" ? dt_original : dt_original.Select("nombre_completo like '%" + filtro + "%'").CopyToDataTable();
+                DataTable dt = new DataTable();
+                if (filtro == "")
+                {
+                    dt = dt_original;
+                }
+                else {
+                    if (dt_original.Select("nombre_completo like '%" + filtro + "%'").Length > 0)
+                    {
+                        dt = filtro == "" ? dt_original : dt_original.Select("nombre_completo like '%" + filtro + "%'").CopyToDataTable();
+                    }
+                }
+               
 
                 if (dt.Rows.Count > 0)
                 {
@@ -1237,10 +1257,16 @@ namespace presentacion
                     rdlempleadosproyecto.DataSource = dt;
                     rdlempleadosproyecto.DataBind();
                 }
+                else {
+
+                    Alert.ShowAlertError("No se encontro ninguna coincidencia. Intentelo nuevamente.", this);
+                }                
+               
+                
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Error al cargar lista de empleados. " + ex.ToString(), this);
+                Alert.ShowAlertError("Error al cargar lista de empleados. ", this);
             }
         }
 
@@ -1335,6 +1361,105 @@ namespace presentacion
 
         #region EVENTOS
 
+        /// <summary>
+        /// Cargar un script para la grafica
+        /// </summary>
+        private void CargarGrafica(int id_proyecto)
+        {
+            try
+            {
+                //entregables
+                EntregablesCOM componente = new EntregablesCOM();
+                proyectos_entregables entidad = new proyectos_entregables();
+                DataTable dt_entregables = componente.GetAll(id_proyecto);
+                string colores = "";
+                foreach (DataRow row in dt_entregables.Rows)
+                {
+                    DateTime fecha = Convert.ToDateTime(row["fecha"]);
+                    int avance = Convert.ToInt32(row["avance"]);
+                    if (avance < 30)
+                    {
+                        //azul
+                        colores = colores + "'#1565c0',";
+                    }
+                    else if (avance < 80 && avance > 30)
+                    {
+                        //amarillo
+                        colores = colores + "'#ffeb3b',";
+                    }
+                    else if (avance > 80)
+                    {
+                        //azul
+                        colores = colores + "'#00897b',";
+                    }
+
+
+                    if (avance < 100 && DateTime.Now > fecha)
+                    {
+                        //rojo
+                        colores = colores + "'#C42C2C',";
+                    }
+                }
+                colores = colores.TrimEnd(',');
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append("<script type='text/javascript'>");
+                sb.Append(""
+                            + "var title = document.getElementById('ContentPlaceHolder1_lblproyect').innerText;"
+                            + "Highcharts.chart('container', {"
+                            + "colors: ["+colores+"],"
+                            + "data: {"
+                            + "table: 'ContentPlaceHolder1_grid_entregables_hide'"
+                            + "},"
+                            + "yAxis: {"
+                               + "max: 100,"
+                               + "min:0"
+                          + " },"
+                            + "chart: {"
+                            + "type: 'column'"
+                            + " },"
+                            + " title: {"
+                            + "     text: ''"
+                            + " },"
+                            + "  yAxis: {"
+                            + "      allowDecimals: false,"
+                            + "      title: {"
+                            + "          text: title"
+                            + "      }"
+                            + " },"
+                            + "  tooltip: {"
+                            + "      formatter: function () {"
+                            + "          return '<b>' + this.series.name + '</b><br />' +"
+                            + "              this.point.y + ' % ' + this.point.name.toLowerCase().split('-')[1];"
+                            + "       }"
+                            + "   },"
+                            + "  plotOptions: {"
+                            + "      column: {"
+                            + "          colorByPoint: true"
+                            + "      },"
+                            + "      series: {"
+                            + "          cursor: 'name',"
+                            + "          point: {"
+                            + "              events: {"
+                            + "                   click: function () {"
+                            + "                       LoadPage();"
+                            + "                       OpenModalEntregableForGraph(this.name.split('-')[0]);"
+                            + "                       }"
+                            + "                     }"
+                            + "                  }"
+                            + "               }"
+                            + "             }"
+                            + "          });"
+                            + "      ");
+                sb.Append("</script>");
+                ClientScript.RegisterStartupScript(this.GetType(), Guid.NewGuid().ToString(), sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                Alert.ShowAlertError(ex.ToString(), this);
+            }
+            
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
             int id_proyecto = Request.QueryString["id_proyecto"] == null ? 0 : Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
@@ -1347,6 +1472,7 @@ namespace presentacion
             {
                 if (!IsPostBack)
                 {
+
                     proyecto_general.pid_proyecto = id_proyecto;
                     ViewState["dt_participantes"] = null;
                     ViewState["dt_empleados"] = null;
@@ -1355,6 +1481,8 @@ namespace presentacion
                     ViewState["correo_bienvenida"] = null;
                     ViewState["dt_contactos_original"] = null;
                     ViewState["dt_pendientes"] = null;
+                    ViewState["pendiente_responsable"] = null;
+                    ViewState["pendiente_descripcion"] = null;
                     CargarProyectos(id_proyecto, usuario, Convert.ToBoolean(Session["administrador"]));
                     funciones.ActualizaAvances();
                     if (Request.QueryString["tab"] == null)
@@ -1374,7 +1502,7 @@ namespace presentacion
                     lnkaddparticipante.Visible = !cliente;
                     lnkguardarminuta.Visible = !cliente;
                     lnknuevaminuta.Visible = !cliente;
-                    cbxpublico.Checked = true;
+                    cbxpublico.Checked = false;
                     cbxpublico.Enabled = !cliente;
                     lnkguardartarea_modal.Visible = !cliente;
                     lnkeliminartarea_modal.Visible = !cliente;
@@ -1390,10 +1518,23 @@ namespace presentacion
                     bool es_creador = Convert.ToBoolean(ViewState["es_creador"]);
                     bool administrador = Convert.ToBoolean(Session["administrador"]);
                     lnkterminacíon.Visible = ((es_creador || administrador) && !cliente);
+                  
                 }
             }
         }
 
+        private void CargarGraficaMailstones()
+        {
+            try
+            {
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         protected void lnkeditar_cambios_Click(object sender, EventArgs e)
         {
             div_errormodal.Visible = false;
@@ -1562,7 +1703,7 @@ namespace presentacion
                 ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
                     "ModalClose();", true);
                 ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
-                    "AlertGO('Entregable Guardado Correctamente', '" + url + "');", true);
+                    "AlertGO('Milestone Guardado Correctamente', '" + url + "');", true);
             }
             else
             {
@@ -1643,6 +1784,9 @@ namespace presentacion
                 }
                 Boolean cliente = Convert.ToBoolean(Session["cliente"]);
                 lnkeliminarentregable.Visible = !cliente;
+
+                System.Web.UI.ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
+                                 "ModalCloseGlobal('#myModalLoad');", true);
                 ModalShow("#myModalEntregablle");
             }
         }
@@ -2277,6 +2421,8 @@ namespace presentacion
 
         protected void lnkpendientes_Click(object sender, EventArgs e)
         {
+            rtxtresponsable.Text = "";
+            rtxtpendiente.Text = "";
             MinutasCOM minutas = new MinutasCOM();
             DataTable dt_pendientes = minutas.GetAllPendientes(Convert.ToInt32(txtid_minuta.Text == "" ? "0" : txtid_minuta.Text));
             if (dt_pendientes.Rows.Count > 0)
@@ -2311,7 +2457,7 @@ namespace presentacion
         {
             div_listempleados.Visible = false;
             div_nievoinvo.Visible = true;
-
+            rdllista_empleados.Items.Clear();
             txtid_invo.Text = "";
             rtxtnombreinvo.Text = "";
             rtxttelefonoinvo.Text = "";
@@ -2534,6 +2680,13 @@ namespace presentacion
                 }
                 else
                 {
+                    if (ViewState["pendiente_responsable"] != null && ViewState["pendiente_descripcion"] != null)
+                    {
+                        string nombre = ViewState["pendiente_responsable"] as string;
+                        string pendiente = ViewState["pendiente_descripcion"] as string;
+                        DeleteTablePendientes(nombre, pendiente);
+
+                    }
                     if (collection.Count > 0)
                     {
                         foreach (RadListBoxItem item in collection)
@@ -2555,6 +2708,10 @@ namespace presentacion
                     rtxtpendiente.Text = "";
                     rdtfecha_planeada.SelectedDate = null;
                     rtxtorganizacion.Text = "";
+                    rtxtresponsable.Text = "";
+                    rdlinvopendientes.SelectedItems.Clear();
+                    ViewState["pendiente_responsable"] = null;
+                    ViewState["pendiente_descripcion"] = null;
                 }
             }
             catch (Exception ex)
@@ -2567,12 +2724,13 @@ namespace presentacion
 
         protected void lnkagregar_Click(object sender, EventArgs e)
         {
-            div_addparticipante.Visible = true;
-            div_selectedinvo.Visible = true;
+            div_addparticipante.Visible = !div_addparticipante.Visible;
+        // div_selectedinvo.Visible = !div_selectedinvo.Visible;
         }
 
         protected void lnkagregarempleado_Click(object sender, EventArgs e)
         {
+            rdllista_empleados.Items.Clear();
             div_nievoinvo.Visible = false;
             div_listempleados.Visible = true;
             txtbuscarempleado.Text = "";
@@ -2582,7 +2740,7 @@ namespace presentacion
             rtxtcorreoinvo.Text = "";
             lnkeliminarinvolucrado.Visible = false;
             diverror_invo.Visible = false;
-            CargarListadoEmpleados("");
+
             ModalShow("#myModalInvolucrados");
         }
 
@@ -2656,6 +2814,7 @@ namespace presentacion
             ddltipos_usuarios.Enabled = false;
             div_addnewcontact.Visible = false;
             rdlcontacto_clientes.Visible = true;
+            lnkbuscarcliente.Visible = true;
             if (idcliente > 0)
             {
                 ClientesCOM clientes = new ClientesCOM();
@@ -2663,8 +2822,9 @@ namespace presentacion
                 div_usuarios.Visible = !usuarios.ExistUserCliente(idcliente);
                 DataTable dt_clientes = clientes.ListadoClientes(idcliente).Tables[0];
                 txtbuscarclientes.Text = dt_clientes.Rows[0]["razon_social"].ToString();
-                txtbuscarclientes_TextChanged(null, null);
+                lnkbuscarcliente_Click(null, null);
                 txtbuscarclientes.Visible = false;
+                lnkbuscarcliente.Visible = false;
                 rdlclientes.Enabled = false;
                 rdlclientes.SelectedValue = idcliente.ToString();
                 CargarContactoClientes();
@@ -2837,13 +2997,14 @@ namespace presentacion
 
         protected void txtbuscarempleadoproyecto_TextChanged(object sender, EventArgs e)
         {
-            CargarListadoEmpleados(txtbuscarempleadoproyecto.Text.Trim());
+           
         }
 
         protected void lnkagregarempleadoaproyecto_Click(object sender, EventArgs e)
         {
+            rdlempleadosproyecto.Items.Clear();
             txtbuscarempleadoproyecto.Text = "";
-            CargarListadoEmpleados("");
+            
             ModalShow("#myModalEmpleados");
         }
 
@@ -2860,9 +3021,10 @@ namespace presentacion
                 {
                     vmensaje = "Seleccione minimo 1 empleado.";
                 }
-
+                string correos_pm = "";
                 if (vmensaje == "")
                 {
+                    ProyectosCOM proyectos = new ProyectosCOM();
                     foreach (RadListBoxItem item in collection)
                     {
                         int no_ = Convert.ToInt32(item.Value);
@@ -2873,19 +3035,16 @@ namespace presentacion
                         entidad.creador = false;
                         entidad.usuario = Session["usuario"] as string;
                         vmensaje = empleados.AgregarPM(entidad);
-                        usuarios entidadus = new usuarios();
-                        entidadus.id_cliente = null;
-                        entidadus.id_uperfil = 3;
-                        EmpleadosCOM empleados_com = new EmpleadosCOM();
-                        Employee enti = new Employee();
-                        DataTable dt_empleados = empleados_com.Get(enti);
-                        DataTable dt_filter = dt_empleados.Select("no_ = " + no_.ToString().Trim() + "").CopyToDataTable();
-                        if (dt_filter.Rows.Count > 0)
+
+                        DataTable dt_empleados = proyectos.ListadoEmpleadoProyecto(Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]))).Tables[0];
+
+                        foreach (DataRow row in dt_empleados.Rows)
                         {
-                            entidadus.usuario = dt_filter.Rows[0]["Usuario_Red"].ToString().ToUpper();
-                            entidadus.password = "";
-                            UsuariosCOM pusuarios = new UsuariosCOM();
-                            vmensaje = pusuarios.Agregar(entidadus)[0];
+                            int nom_empl = Convert.ToInt32(row["no_"]);
+                            if (no_ == nom_empl)
+                            {
+                                correos_pm = correos_pm + row["correo"].ToString().Trim() + ";";
+                            }
                         }
                         if (vmensaje != "") { break; }
                     }
@@ -2893,6 +3052,12 @@ namespace presentacion
 
                 if (vmensaje == "")
                 {
+                    //aqui es we
+                    if (correos_pm != "")
+                    {
+
+                        EnviarCorreo(correos_pm, "Asignación de Proyecto", "", 6);
+                    }
                     string url = "proyecto_general.aspx?tab=tadmin&id_proyecto=" + Request.QueryString["id_proyecto"];
                     ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
                         "AlertGO('Configuración Guardada Correctamente', '" + url + "');", true);
@@ -3251,8 +3416,86 @@ namespace presentacion
 
         protected void lnkagregarnuevocontacto_Click(object sender, EventArgs e)
         {
-            rdlcontacto_clientes.Visible = !rdlcontacto_clientes.Visible;
+           // rdlcontacto_clientes.Visible = !rdlcontacto_clientes.Visible;
             div_addnewcontact.Visible = !div_addnewcontact.Visible;
+        }
+
+        protected void lnkeditarparticipante_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                LinkButton lnk = sender as LinkButton;
+                string nombre = lnk.CommandArgument;
+                string pendiente = lnk.CommandName;
+                if (ViewState["dt_pendientes"] != null)
+                {
+                    DataTable dt = ViewState["dt_pendientes"] as DataTable;
+                    DataTable dt_filter = dt.Select("descripcion = '"+pendiente.Trim()+ "' and responsable = '"+nombre+"'").CopyToDataTable();
+                    if (dt_filter.Rows.Count > 0)
+                    {
+                        rtxtresponsable.Text = dt_filter.Rows[0]["responsable"].ToString();
+                        rtxtpendiente.Text = dt_filter.Rows[0]["descripcion"].ToString();
+                        rdtfecha_planeada.SelectedDate = Convert.ToDateTime(dt_filter.Rows[0]["fecha"]);
+                        ViewState["pendiente_responsable"] = nombre;
+                        ViewState["pendiente_descripcion"] = pendiente;
+                    }
+                    else {
+
+                        div_pendientes.Visible = true;
+                        lblerrorpendientes.Text = "Se genero un error al buscar el pendiente. Contacte a su administrador.";
+                        ModalShow("#myModalPendientes");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                div_pendientes.Visible = true;
+                lblerrorpendientes.Text = ex.ToString();
+                ModalShow("#myModalPendientes");
+            }
+        }
+
+        protected void btnbuscarempleado_Click(object sender, EventArgs e)
+        {
+            if (txtbuscarempleadoproyecto.Text.Trim().Length > 2)
+            {
+                CargarListadoEmpleados(txtbuscarempleadoproyecto.Text.Trim());
+                imgloadempleados.Style["display"] = "none";
+                lblbe.Style["display"] = "none";
+            }
+            else
+            {
+                Alert.ShowAlertInfo("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema", this);
+            }
+
+        }
+
+        protected void btnbuscarempleado2_Click(object sender, EventArgs e)
+        {
+            if (txtbuscarempleado.Text.Trim().Length > 2)
+            {
+                CargarListadoEmpleados(txtbuscarempleado.Text.Trim());
+                imgloadempleados.Style["display"] = "none";
+                lblbe2.Style["display"] = "none";
+            }
+            else {
+                Alert.ShowAlertInfo("Ingrese un minimo de 3 caracteres para realizar la busqueda.","Mensaje del Sistema",this);
+            }
+
+        }
+
+        protected void lnkbuscarcliente_Click(object sender, EventArgs e)
+        {
+            if (txtbuscarclientes.Text.Trim().Length > 2)
+            {
+                CargarListaClientes(txtbuscarclientes.Text.Trim());
+                imgloadcliente.Style["display"] = "none";
+                lblloadcliente.Style["display"] = "none";
+            }
+            else
+            {
+                Alert.ShowAlertInfo("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema", this);
+            }
         }
     }
 }

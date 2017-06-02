@@ -24,6 +24,7 @@
             $('#myModalDocumentos').modal('hide');
             $('#myModalMinutas').modal('hide');
             $('#myModalPendientes').modal('hide');
+            $('#myModalLoad').modal('hide');
         }
 
         function OnClickConfirm() {
@@ -42,8 +43,11 @@
         $(document).ready(function () {
             IniciarEditor();
             Init();
-            CargarGrafica();
+            // CargarGrafica();
         });
+
+        function ClientNodeClicked(sender, eventArgs) {
+        }
 
         function IniciarEditor() {
             $("#ContentPlaceHolder1_txtbody").wysihtml5();
@@ -85,48 +89,28 @@
             });
         }
 
-        function CargarGrafica() {
-            var title = document.getElementById('<%= lblproyect.ClientID%>').innerText;
-            Highcharts.chart('container', {
-                colors: ['#C42C2C'],
-                data: {
-                    table: '<%= grid_entregables_hide.ClientID%>'
-                },
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                yAxis: {
-                    allowDecimals: false,
-                    title: {
-                        text: title
-                    }
-                },
-                tooltip: {
-                    formatter: function () {
-                        return '<b>' + this.series.name + '</b><br />' +
-                            this.point.y + ' % ' + this.point.name.toLowerCase().split('-')[1];
-                    }
-                },
-                plotOptions: {
-                    series: {
-                        cursor: 'name',
-                        point: {
-                            events: {
-                                click: function () {
-                                    OpenModalEntregableForGraph(this.name.split('-')[0]);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+        function ChangedTextLoad()
+        {            
+            $("#<%= imgloadempleados.ClientID%>").show();
+            $("#<%= lblbe.ClientID%>").show();
+            return true;
         }
-
+         function ChangedTextLoad2()
+        {            
+            $("#<%= imgloadempleado_.ClientID%>").show();
+            $("#<%= lblbe2.ClientID%>").show();
+            return true;
+        }
+            function ChangedTextLoad3()
+        {            
+            $("#<%= imgloadcliente.ClientID%>").show();
+            $("#<%= lblloadcliente.ClientID%>").show();
+            return true;
+        }
         function OpenModalEntregableForGraph(id_entregable) {
             // alert('ID ' + id_entregable);
+            //ModalShow('#myModalLoad');
+            
             var myHidden = document.getElementById('<%= hdfid_entregable.ClientID %>');
 
             myHidden.value = id_entregable;
@@ -347,7 +331,7 @@
                         //var redi = parseInt(data.context.redirect);
                         var id = data.context.id;
                         var myHidden = document.getElementById('<%= hdfid_involucrado.ClientID %>');
-
+                        
                         $("#<%= div_nievoinvo.ClientID%>").show();
                         $("#<%= div_listempleados.ClientID%>").hide();
                         myHidden.value = id;
@@ -480,7 +464,7 @@
                     options.onMouseClick = function (e, data) {
                         var id = data.context.id;
                         var myHidden = document.getElementById('<%= hdfid_involucrado.ClientID %>');
-
+                     
                         myHidden.value = id;
                         $("#<%= div_nievoinvo.ClientID%>").show();
                         $("#<%= div_listempleados.ClientID%>").hide();
@@ -665,21 +649,22 @@
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-12">
                                 <h5><strong><i class="fa fa-users" aria-hidden="true"></i>&nbsp;Diagrama de Involucrados</strong>
-                                    <span>
-                                        <asp:LinkButton ID="lnkagregarinvolucrado" CssClass="btn btn-primary btn-flat btn-xs" runat="server" OnClick="lnkagregarinvolucrado_Click">
-                                          Agregar Involucrado&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton>
-                                    </span>
                                 </h5>
+                                <div style="text-align:right;">
+                                     <asp:LinkButton ID="lnkagregarinvolucrado" CssClass="btn btn-primary btn-flat btn-sm" runat="server" OnClientClick="LoadPage();" OnClick="lnkagregarinvolucrado_Click">
+                                          Agregar Involucrado del Cliente&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton>
+                                </div>
                                 <div id="basicdiagram" style="border-style: solid; border-width: 1px; width: 100%; height: 450px">
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-12">
                                 <h5><strong><i class="fa fa-users" aria-hidden="true"></i>&nbsp;Diagrama de Empleados</strong>
-                                    <span>
-                                        <asp:LinkButton ID="lnkagregarempleado" CssClass="btn btn-danger btn-flat btn-xs" runat="server" OnClick="lnkagregarempleado_Click">
-                                          Agregar Empleado&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton>
-                                    </span>
+                                 
                                 </h5>
+                                 <div style="text-align:right;">
+                                    <asp:LinkButton ID="lnkagregarempleado" CssClass="btn btn-danger btn-flat btn-sm"  OnClientClick="LoadPage();" runat="server" OnClick="lnkagregarempleado_Click">
+                                          Agregar Empleado&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton>
+                                </div>
                                 <div id="basicdiagram_employeed" style="border-style: solid; border-width: 1px; width: 100%; height: 450px">
                                 </div>
                             </div>
@@ -690,11 +675,9 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <h5><strong><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Minutas</strong>
-
-                                    <span>
-                                        <asp:LinkButton CssClass="btn btn-danger btn-sm btn-flat" ID="lnknuevaminuta" OnClick="lnknuevaminuta_Click" runat="server">
-                                            Nueva Minuta&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton></span>
                                 </h5>
+                                 <asp:LinkButton CssClass="btn btn-danger btn-sm btn-flat" ID="lnknuevaminuta" OnClick="lnknuevaminuta_Click" runat="server">
+                                            Nueva Minuta&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton>
                             </div>
                             <div class="col-lg-12">
 
@@ -752,11 +735,9 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <h5><strong><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Documentos Anexos al Proyecto</strong>
-
-                                    <span>
-                                        <asp:LinkButton CssClass="btn btn-danger btn-sm btn-flat" ID="lnknuevodoc" OnClientClick="return ModalShow('#myModalDocumentos');" runat="server">
-                                            Nuevo Documento&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton></span>
-                                </h5>
+                                </h5> 
+                                <asp:LinkButton CssClass="btn btn-danger btn-sm btn-flat" ID="lnknuevodoc" OnClientClick="return ModalShow('#myModalDocumentos');" runat="server">
+                                            Nuevo Documento&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton>
                                 <div class="table table-responsive">
                                     <table class="table table table-responsive table-bordered table-condensed">
                                         <thead>
@@ -805,10 +786,9 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <h5><strong><i class="fa fa-envelope-o"></i>&nbsp;Historial de Correos&nbsp;</strong>
-                                    <span>
-                                <asp:LinkButton CssClass="btn btn-danger btn-flat btn-sm " ID="lnknuevocorreo" OnClick="lnknuevocorreo_Click" runat="server">
-                                            Nuevo Correo&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton></span>
                                 </h5>
+                                 <asp:LinkButton CssClass="btn btn-danger btn-flat btn-sm " ID="lnknuevocorreo" OnClick="lnknuevocorreo_Click" runat="server">
+                                            Nuevo Correo&nbsp;<i class="fa fa-plus" aria-hidden="true"></i></asp:LinkButton>
                             </div>
                             <div class="col-lg-12">
                                 <div class="table table-responsive">
@@ -850,15 +830,11 @@
                             <div class="col-lg-12">
                                 <h5><strong><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Usuarios Relacionados al Proyectos</strong>
 
-                                    <small>&nbsp;Puede Compartir este Proyecto con otro Usuario</small>
                                 </h5>
-                                <div style="text-align: left">
-                                    <asp:LinkButton ID="lnkagregarempleadoaproyecto" CssClass="btn btn-danger btn-flat" runat="server" OnClick="lnkagregarempleadoaproyecto_Click">
+                                <asp:LinkButton ID="lnkagregarempleadoaproyecto" CssClass="btn btn-danger btn-flat btn-sm" runat="server" 
+                                        OnClick="lnkagregarempleadoaproyecto_Click" OnClientClick="LoadPage();">
                                         Agregar PM&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>
                                     </asp:LinkButton>
-                                    <br />
-                                    <br />
-                                </div>
                                 <div class="table table-responsive">
                                     <table class="table table table-responsive table-bordered table-condensed">
                                         <thead>
@@ -976,7 +952,7 @@
                                         <label>Buscar</label>
                                         <telerik:RadTextBox ID="rtxtxsearchtarea" AutoPostBack="true" Width="200px" runat="server" OnTextChanged="rtxtxsearchtarea_TextChanged" Skin="Bootstrap"></telerik:RadTextBox>
                                     </div>
-                                    <telerik:RadTreeView RenderMode="Lightweight" ID="rtrvProyectWorks" runat="server" Width="100%" Style="background-color: white;" Skin="Bootstrap" OnNodeClick="rtrvProyectWorks_NodeClick">
+                                    <telerik:RadTreeView RenderMode="Lightweight" ID="rtrvProyectWorks" runat="server" Width="100%" OnClientNodeClicked="ClientNodeClicked" Style="background-color: white;" Skin="Bootstrap" OnNodeClick="rtrvProyectWorks_NodeClick">
                                         <DataBindings>
                                             <telerik:RadTreeNodeBinding Expanded="False"></telerik:RadTreeNodeBinding>
                                         </DataBindings>
@@ -1190,7 +1166,7 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Nombre del Milestones</strong></h5>
-                                    <telerik:RadTextBox ID="rtxtentregable" Width="100%" runat="server" Skin="Bootstrap" placeholder="Entregable"></telerik:RadTextBox>
+                                    <telerik:RadTextBox ID="rtxtentregable" Width="100%" runat="server" Skin="Bootstrap"></telerik:RadTextBox>
                                 </div>
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;Fecha</strong></h5>
@@ -1552,14 +1528,17 @@
                                     </div>
                                     <div style="text-align: right;">
                                     </div>
+                                    <br />
                                 </div>
                                 <div class="col-lg-12" id="div_selectedinvo" runat="server">
 
                                     <h5><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Seleccione un Involucrado al Proyecto</strong>
                                         &nbsp;<asp:LinkButton ID="lnkagregar" OnClick="lnkagregar_Click" CssClass="btn btn-primary btn-flat btn-xs" runat="server">Agregar Persona Externa</asp:LinkButton>
                                     </h5>
-                                    <telerik:RadListBox RenderMode="Lightweight" runat="server" ID="rdlinvolucrados" Height="150" Width="100%" SelectionMode="Multiple" Skin="Bootstrap">
-                                    </telerik:RadListBox>
+                                    <div style="height: 150px; overflow: scroll;">
+                                        <telerik:RadListBox RenderMode="Lightweight"   Style="font-size: 11px" runat="server" ID="rdlinvolucrados" Width="100%" SelectionMode="Multiple" Skin="Bootstrap">
+                                        </telerik:RadListBox>
+                                    </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <br />
@@ -1650,8 +1629,11 @@
                                 </div>
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Puede Seleccionar un Involucrado del Proyecto</strong></h5>
-                                    <telerik:RadListBox RenderMode="Lightweight" runat="server" ID="rdlinvopendientes" Height="150" Width="100%" Skin="Bootstrap" SelectionMode="Multiple">
-                                    </telerik:RadListBox>
+
+                                    <div style="height: 150px; overflow: scroll;">
+                                        <telerik:RadListBox RenderMode="Lightweight"   Style="font-size: 11px" runat="server" ID="rdlinvopendientes" Width="100%" Skin="Bootstrap" SelectionMode="Multiple">
+                                        </telerik:RadListBox>
+                                    </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <br />
@@ -1665,24 +1647,40 @@
                                                         <HeaderStyle Width="40px" />
                                                         <ItemStyle HorizontalAlign="Center" />
                                                         <ItemTemplate>
+                                                            <asp:LinkButton ID="lnkeditarparticipante"
+                                                                OnClick="lnkeditarparticipante_Click" runat="server" CommandName='<%# DataBinder.Eval(Container.DataItem, "descripcion").ToString() %>'
+                                                                CommandArgument='<%# DataBinder.Eval(Container.DataItem, "responsable").ToString() %>'>
+                                                                <i class="fa fa-pencil fa-2x" aria-hidden="true"></i>
+                                                            </asp:LinkButton>
+                                                        </ItemTemplate>
+                                                    </telerik:GridTemplateColumn>
+                                                    <telerik:GridTemplateColumn>
+                                                        <HeaderStyle Width="40px" />
+                                                        <ItemStyle HorizontalAlign="Center" />
+                                                        <ItemTemplate>
                                                             <asp:LinkButton ID="lnkeliminarparticipante" OnClientClick="return confirm('¿Desea Eliminar este Pendiente?');"
                                                                 OnClick="lnkeliminarpendiente_Click" runat="server" CommandName='<%# DataBinder.Eval(Container.DataItem, "descripcion").ToString() %>'
                                                                 CommandArgument='<%# DataBinder.Eval(Container.DataItem, "responsable").ToString() %>'>
-                                                        <i class="fa fa-trash fa-2x" aria-hidden="true"></i>
+                                                                <i class="fa fa-trash fa-2x" aria-hidden="true"></i>
                                                             </asp:LinkButton>
                                                         </ItemTemplate>
                                                     </telerik:GridTemplateColumn>
                                                     <telerik:GridBoundColumn DataField="responsable" HeaderText="Responsable" UniqueName="nombre"
                                                         Visible="true">
-                                                        <HeaderStyle Width="200px" />
+                                                        <HeaderStyle Width="250px" />
                                                     </telerik:GridBoundColumn>
                                                     <telerik:GridBoundColumn DataField="descripcion" HeaderText="Pendiente" UniqueName="rol"
                                                         Visible="true">
                                                     </telerik:GridBoundColumn>
-                                                    <telerik:GridBoundColumn DataField="fecha" HeaderText="Fecha" UniqueName="organizacion"
-                                                        Visible="true">
+                                                    
+                                                    <telerik:GridTemplateColumn HeaderText="Fecha Planeada">
+                                                        
                                                         <HeaderStyle Width="150px" />
-                                                    </telerik:GridBoundColumn>
+                                                        <ItemStyle HorizontalAlign="Center" />
+                                                        <ItemTemplate>
+                                                            <asp:Label ID="lblfecha_pendiente" Text='<%# Convert.ToDateTime(DataBinder.Eval(Container.DataItem, "Fecha")).ToString("dddd dd MMMM, yyyy", System.Globalization.CultureInfo.CreateSpecificCulture("es-MX")) %>'  runat="server"></asp:Label>
+                                                        </ItemTemplate>
+                                                    </telerik:GridTemplateColumn>
                                                 </Columns>
                                             </MasterTableView>
                                         </telerik:RadGrid>
@@ -1733,7 +1731,7 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <telerik:RadTextBox ID="rtxtcontent" TextMode="MultiLine" Rows="3" runat="server" Skin="Bootstrap" Width="100%"></telerik:RadTextBox>
+                                    <telerik:RadTextBox ID="rtxtcontent" TextMode="MultiLine" Rows="8" runat="server" Skin="Bootstrap" Width="100%"></telerik:RadTextBox>
                                 </div>
                             </div>
 
@@ -1767,6 +1765,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <asp:UpdatePanel ID="UpdatePanel11" runat="server">
                 <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="btnbuscarempleado2" EventName="Click" />
                     <asp:AsyncPostBackTrigger ControlID="lnkagregarinvolucrado" EventName="Click" />
                     <asp:AsyncPostBackTrigger ControlID="lnkagregarempleado" EventName="Click" />
                     <asp:AsyncPostBackTrigger ControlID="btneditarinvol" EventName="Click" />
@@ -1797,14 +1796,28 @@
                             <div class="row" id="div_listempleados" runat="server" visible="false">
                                 <asp:UpdatePanel ID="UpdatePanel13" runat="server" UpdateMode="Always">
                                     <ContentTemplate>
-                                        <div class="col-lg-12">
+                                        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
                                             <h5><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Seleccione un empleado</strong></h5>
-                                            <div style="text-align: right;">
-                                                <asp:TextBox ID="txtbuscarempleado" CssClass="form-control" Width="200px" placeholder="Buscar" AutoPostBack="true" OnTextChanged="txtbuscarempleado_TextChanged" runat="server"></asp:TextBox>
+                                            <div style="text-align: left;" class="input-group input-group-sm">
+                                                <asp:TextBox ID="txtbuscarempleado" CssClass="form-control" placeholder="Buscar" runat="server"></asp:TextBox>
+                                                <span class="input-group-btn">
+                                                    <asp:LinkButton ID="btnbuscarempleado2" CssClass="btn btn-primary btn-flat" runat="server" OnClientClick="return ChangedTextLoad2();" OnClick="btnbuscarempleado2_Click">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                                    </asp:LinkButton>
+                                                </span>
                                             </div>
-                                            <telerik:RadListBox RenderMode="Lightweight" runat="server" ID="rdllista_empleados" Height="150" Width="100%"
-                                                Skin="Bootstrap" SelectionMode="Single" OnSelectedIndexChanged="rdllista_empleados_SelectedIndexChanged" AutoPostBack="true">
-                                            </telerik:RadListBox>
+
+                                            <asp:Image ID="imgloadempleado_" Style="display: none;" ImageUrl="~/img/load.gif" runat="server" />
+                                            <label id="lblbe2" runat="server" style="display: none; color: #1565c0">Buscando Empleados</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+
+                                            <div style="height: 150px; overflow: scroll;">
+                                                <telerik:RadListBox RenderMode="Lightweight" runat="server" ID="rdllista_empleados" Width="100%"   Style="font-size: 11px"
+                                                    Skin="Bootstrap" SelectionMode="Single" OnSelectedIndexChanged="rdllista_empleados_SelectedIndexChanged" AutoPostBack="true">
+                                                </telerik:RadListBox>
+                                            </div>
                                         </div>
                                     </ContentTemplate>
                                 </asp:UpdatePanel>
@@ -1832,6 +1845,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <%--<asp:Button ID="btnbuscarempleado2" runat="server" Text="Button" Style="display: none;" OnClick="btnbuscarempleado2_Click"/>--%>
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
                             <asp:LinkButton ID="lnkeliminarinvolucrado" Visible="false" CssClass="btn btn-danger btn-flat" OnClick="lnkeliminarinvolucrado_Click"
                                 OnClientClick="return ConfirmEntregableDelete('¿Desea Eliminar este Involucrado?');" runat="server">
@@ -1857,6 +1871,7 @@
             <asp:UpdatePanel ID="UpdatePanel14" runat="server">
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="lnkseleccionarcliente" EventName="Click" />
+                    <asp:AsyncPostBackTrigger ControlID="lnkbuscarcliente" EventName="Click" />
                 </Triggers>
                 <ContentTemplate>
                     <div class="modal-content">
@@ -1868,14 +1883,27 @@
                         <div class="modal-body">
 
                             <div class="row" id="div_listaclientes" runat="server" visible="false">
-                                <div class="col-lg-12">
+                                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+
                                     <h5><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Seleccione un Cliente</strong></h5>
-                                    <div style="text-align: right;">
-                                        <asp:TextBox ID="txtbuscarclientes" CssClass="form-control" Width="200px" placeholder="Buscar" AutoPostBack="true" OnTextChanged="txtbuscarclientes_TextChanged" runat="server"></asp:TextBox>
+                                    <div style="text-align: left;">
+                                        <asp:TextBox ID="txtbuscarclientes" CssClass="form-control" placeholder="Buscar"  runat="server"></asp:TextBox>
+                                        <span class="input-group-btn">
+                                            <asp:LinkButton ID="lnkbuscarcliente" CssClass="btn btn-primary btn-flat" runat="server" OnClientClick="return ChangedTextLoad3();" OnClick="lnkbuscarcliente_Click">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </asp:LinkButton>
+                                        </span>
                                     </div>
-                                    <telerik:RadListBox Style="font-size: 10px" RenderMode="Lightweight" runat="server" ID="rdlclientes" Height="100" Width="100%"
+
+                                    <asp:Image ID="imgloadcliente" Style="display: none;" ImageUrl="~/img/load.gif" runat="server" />
+                                    <label id="lblloadcliente" runat="server" style="display: none; color: #1565c0">Buscando Clientes</label>
+                                </div>
+                                <div  class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div style="height: 100px; overflow: scroll;">
+                                    <telerik:RadListBox Style="font-size: 10px" RenderMode="Lightweight" runat="server" ID="rdlclientes" Width="100%"
                                         Skin="Bootstrap" SelectionMode="Single" OnSelectedIndexChanged="rdlclientes_SelectedIndexChanged" AutoPostBack="true">
                                     </telerik:RadListBox>
+                                        </div>
                                 </div>
                             </div>
                             <div class="row">
@@ -1898,9 +1926,12 @@
                                                 runat="server" OnClick="lnkagregarnuevocontacto_Click">
                                                 Agregar Nuevo Contacto</asp:LinkButton></span>
                                     </h5>
-                                    <telerik:RadListBox Style="font-size: 10px" RenderMode="Lightweight" runat="server" ID="rdlcontacto_clientes" Height="100" Width="100%"
+                                    
+                                    <div style="height: 100px; overflow: scroll;">
+                                    <telerik:RadListBox Style="font-size: 10px" RenderMode="Lightweight" runat="server" ID="rdlcontacto_clientes" Width="100%"
                                         OnItemDataBound="rdlcontacto_clientes_ItemDataBound" Skin="Bootstrap" SelectionMode="Multiple">
                                     </telerik:RadListBox>
+                                        </div>
                                     <div id="div_addnewcontact" runat="server" visible="false">
                                         <div class="col-lg-12">
                                             <h5><strong>Nombre</strong></h5>
@@ -1962,6 +1993,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <asp:UpdatePanel ID="UpdatePanel15" runat="server">
                 <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="btnbuscarempleado" EventName="Click" />
                     <asp:AsyncPostBackTrigger ControlID="lnkagregarempleadoaproyecto" EventName="Click" />
                 </Triggers>
                 <ContentTemplate>
@@ -1973,15 +2005,29 @@
                         </div>
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
                                     <h5><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Seleccione uno o mas empleados</strong></h5>
-                                    <div style="text-align: right;">
-                                        <asp:TextBox ID="txtbuscarempleadoproyecto" CssClass="form-control" Width="200px" placeholder="Buscar" AutoPostBack="true"
-                                            OnTextChanged="txtbuscarempleadoproyecto_TextChanged" runat="server"></asp:TextBox>
+                                    <div style="text-align: left;" class="input-group input-group-sm">
+                                        <asp:TextBox ID="txtbuscarempleadoproyecto" CssClass="form-control" placeholder="Buscar"
+                                            runat="server"></asp:TextBox>
+                                        <span class="input-group-btn">
+                                            <asp:LinkButton ID="btnbuscarempleado" CssClass="btn btn-primary btn-flat" runat="server" OnClientClick="ChangedTextLoad();" OnClick="btnbuscarempleado_Click">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </asp:LinkButton>
+                                        </span>
                                     </div>
-                                    <telerik:RadListBox RenderMode="Lightweight" runat="server" ID="rdlempleadosproyecto" Height="150" Width="100%"
-                                        Skin="Bootstrap" SelectionMode="Multiple">
-                                    </telerik:RadListBox>
+
+                                    <asp:Image ID="imgloadempleados" Style="display: none;" ImageUrl="~/img/load.gif" runat="server" />
+                                    <label id="lblbe" runat="server" style="display: none; color: #1565c0">Buscando Empleados</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                   
+                                    <div style="height: 200px; overflow: scroll;">
+
+                                        <telerik:RadListBox RenderMode="Lightweight" runat="server" ID="rdlempleadosproyecto"  Style="font-size: 11px" Width="100%"
+                                            Skin="Bootstrap" SelectionMode="Multiple">
+                                        </telerik:RadListBox>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1994,13 +2040,14 @@
                                     </div>
                                 </div>
                             </div>
+                           <%-- <asp:Button ID="btnbuscarempleado" runat="server" Text="Button" Style="display: none;" OnClick="btnbuscarempleado_Click" />--%>
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
                             <asp:LinkButton OnClientClick="return false;" ID="lnkcargarempleados" CssClass="btn btn-primary btn-flat" runat="server" Style="display: none;">
                                             <i class="fa fa-refresh fa-spin fa-fw"></i>
-                                            <span class="sr-only">Loading...</span>&nbsp;Guardando Configuracion...
+                                            <span class="sr-only">Loading...</span>&nbsp;Guardando Configuración...
                             </asp:LinkButton>
                             <asp:LinkButton ID="lnkguardarempleado" CssClass="btn btn-primary btn-flat" OnClick="lnkguardarempleado_Click"
-                                OnClientClick="return ConfirmEmpleadoProyectoModal('¿Desea Terminar el Proyecto?');" runat="server">
+                                OnClientClick="return ConfirmEmpleadoProyectoModal('¿Desea Guardar esta configuración del Proyecto?');" runat="server">
                                             <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Guardar
                             </asp:LinkButton>
                         </div>
@@ -2146,13 +2193,32 @@
                                             <span class="sr-only">Loading...</span>&nbsp;Terminando Proyecto...
                             </asp:LinkButton>
                             <asp:LinkButton ID="lnkterminaproyecto" CssClass="btn btn-danger btn-flat" OnClick="lnkterminaproyecto_Click"
-                                OnClientClick="return ConfirmTerminarProyecto('¿Desea Guardar esta configuración?');" runat="server">
+                                OnClientClick="return ConfirmTerminarProyecto('¿Desea Terminar el Proyecto?');" runat="server">
                                             <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Terminar
                             </asp:LinkButton>
                         </div>
                     </div>
                 </ContentTemplate>
             </asp:UpdatePanel>
+        </div>
+    </div>
+
+    <div class="modal fade bs-example-modal-xs" tabindex="-1" id="myModalLoad" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xs" role="document">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <asp:Image ID="idid" Style="display: block; margin: 0 auto;"
+                                runat="server" ImageUrl="~/img/loading_2.gif" />
+                            <h3 style="text-align:center;"><strong>Cargando Información...</strong></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

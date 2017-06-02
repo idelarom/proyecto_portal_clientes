@@ -28,7 +28,7 @@ namespace datos.Modelos
         [StringLength(1000)]
         public string nombre { get; set; }
 
-        [StringLength(50)]
+        [StringLength(250)]
         public string telefono { get; set; }
 
         [StringLength(50)]
