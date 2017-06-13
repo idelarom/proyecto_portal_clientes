@@ -1,10 +1,18 @@
 ﻿using datos.Modelos;
+using datos.NAVISION;
 using negocio.Componentes;
+using negocio.Entidades;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 using Telerik.Web.UI;
 
 namespace presentacion
@@ -16,7 +24,7 @@ namespace presentacion
             if (!IsPostBack)
             {
                 string usuario = Session["usuario"] as string;
-                CargarProyectos(usuario, Convert.ToBoolean(Session["administrador"]));
+                CargarProyectos(usuario, Convert.ToBoolean(Session["administrador"]),"");
 
                 Boolean cliente = Convert.ToBoolean(Session["cliente"]);
                 nvoproyect.Visible = !cliente;
@@ -270,16 +278,32 @@ namespace presentacion
                              "ModalShow('" + modalname + "');", true);
         }
 
-        private void CargarProyectos(string usuario, bool administrador)
+        private void CargarProyectos(string usuario, bool administrador, string usuario_filtro)
         {
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"])).Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"]), usuario_filtro).Tables[0];
+                th_pm.Visible = (administrador && Convert.ToInt32(Session["id_cliente"]) == 0);
+                div_combo_pm_x_proyecto.Visible = (administrador && Convert.ToInt32(Session["id_cliente"]) == 0);
                 if (dt.Rows.Count > 0)
                 {
                     repeat_mis_proyectos.DataSource = dt.AsEnumerable().Take(10).CopyToDataTable();
                     repeat_mis_proyectos.DataBind();
+                }
+                else {
+
+                    repeat_mis_proyectos.DataSource = null;
+                    repeat_mis_proyectos.DataBind();
+                }
+                if (usuario_filtro == "")
+                {
+
+                    DataTable dt_pm = proyectos.sp_combo_pm_x_proyecto().Tables[0];
+                    ddlpm_x_proyecto.DataTextField = "pm";
+                    ddlpm_x_proyecto.DataValueField = "usuario";
+                    ddlpm_x_proyecto.DataSource = dt_pm;
+                    ddlpm_x_proyecto.DataBind();
                 }
             }
             catch (Exception ex)
@@ -451,5 +475,32 @@ namespace presentacion
 
         #endregion EVENTOS
 
+        protected void ddlpm_x_proyecto_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        protected void ddlpm_x_proyecto_ItemChecked(object sender, RadComboBoxItemEventArgs e)
+        {
+
+         
+        }
+
+        protected void lnkfiltro_Click(object sender, EventArgs e)
+        {
+            IList<RadComboBoxItem> collection = ddlpm_x_proyecto.CheckedItems;
+            string usuario_filtro = "";
+            string usuario = Session["usuario"] as string;
+            if (collection.Count > 0)
+            {
+               
+                foreach (RadComboBoxItem item in collection)
+                {
+                    usuario_filtro = usuario_filtro +"'" +item.Value.ToString().Trim().ToUpper() + "',";
+                }
+                usuario_filtro = usuario_filtro.TrimEnd(',');
+                usuario_filtro = usuario_filtro == "0" ? "" : usuario_filtro;               
+            }
+            CargarProyectos(usuario, Convert.ToBoolean(Session["administrador"]), usuario_filtro);
+        }
     }
 }

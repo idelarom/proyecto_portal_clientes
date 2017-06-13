@@ -75,8 +75,7 @@
                 <div class="col-lg-12">
                     <br />
                     <p style="font-size: 10px; text-align: justify;">
-                        Advertencia: El uso de este sistema es limitado a usuarios autorizados
-                         Este sistema de cómputo es propiedad privada de Migesa y puede ser usado sólo por aquellos individuos autorizados por Migesa. El uso que se le dé a este sistema puede ser monitoreado de acuerdo a las políticas de Migesa
+                        Advertencia: El uso de este sistema es limitado a usuarios autorizados. Este sistema es propiedad privada de Migesa y puede ser usado sólo por aquellos individuos autorizados por Migesa. El uso que se le dé a este sistema puede ser monitoreado de acuerdo a las políticas de Migesa.
                     </p>
                 </div>
             </div>

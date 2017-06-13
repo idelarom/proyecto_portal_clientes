@@ -610,30 +610,30 @@
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                 <h5><strong><i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;Proyect Charter</strong></h5>
                                 <div style="text-align: left;">
-                                    <asp:LinkButton ID="lnkobjetivos" OnClick="lnkobjetivos_Click" CommandArgument="objetivos" runat="server" CssClass="btn btn-default btn-flat">
+                                    <asp:LinkButton ID="lnkobjetivos" OnClick="lnkobjetivos_Click"  OnClientClick="LoadPage();" CommandArgument="objetivos" runat="server" CssClass="btn btn-default btn-flat">
                                         <i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Objetivos del Proyecto
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="lnkdescsolucion" OnClick="lnkobjetivos_Click" CommandArgument="solucion" runat="server" CssClass="btn btn-default btn-flat">
+                                    <asp:LinkButton ID="lnkdescsolucion" OnClick="lnkobjetivos_Click" OnClientClick="LoadPage();"  CommandArgument="solucion" runat="server" CssClass="btn btn-default btn-flat">
                                         <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Descripción de la solución
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="lnksupuestos" OnClick="lnkobjetivos_Click" CommandArgument="supuestos" runat="server" CssClass="btn btn-default btn-flat">
+                                    <asp:LinkButton ID="lnksupuestos" OnClick="lnkobjetivos_Click" OnClientClick="LoadPage();"  CommandArgument="supuestos" runat="server" CssClass="btn btn-default btn-flat">
                                         <i class="fa fa-lightbulb-o" aria-hidden="true"></i>&nbsp;Supuestos
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="lnkfueraalcance" OnClick="lnkobjetivos_Click" CommandArgument="alcance" runat="server" CssClass="btn btn-default btn-flat">
+                                    <asp:LinkButton ID="lnkfueraalcance" OnClick="lnkobjetivos_Click" OnClientClick="LoadPage();"  CommandArgument="alcance" runat="server" CssClass="btn btn-default btn-flat">
                                         <i class="fa fa-level-down" aria-hidden="true"></i>&nbsp;Fuera de Alcance
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="lnkriesgos" OnClick="lnkobjetivos_Click" CommandArgument="riesgos" runat="server" CssClass="btn btn-default btn-flat">
+                                    <asp:LinkButton ID="lnkriesgos" OnClick="lnkobjetivos_Click" OnClientClick="LoadPage();"  CommandArgument="riesgos" runat="server" CssClass="btn btn-default btn-flat">
                                         <i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp;Riesgos Alto Nivel
                                     </asp:LinkButton>
                                 </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align: right;">
 
-                                <asp:LinkButton ID="lnkterminacíon" OnClick="lnkterminacíon_Click" CssClass="btn btn-danger btn-flat btng"
+                                <asp:LinkButton ID="lnkterminacíon" OnClick="lnkterminacíon_Click" OnClientClick="LoadPage();" CssClass="btn btn-danger btn-flat btng"
                                     runat="server">
                                     <i class="fa fa-handshake-o" aria-hidden="true"></i>&nbsp;
                                     Terminación</asp:LinkButton>
-                                <asp:LinkButton ID="lnkseleccionarcliente" CssClass="btn btn-success btn-flat" runat="server" OnClick="lnkseleccionarcliente_Click">
+                                <asp:LinkButton ID="lnkseleccionarcliente" OnClientClick="LoadPage();" CssClass="btn btn-success btn-flat" runat="server" OnClick="lnkseleccionarcliente_Click">
                                          <i class="fa fa-user" aria-hidden="true"></i>&nbsp;Info. Cliente
                                 </asp:LinkButton>
                                 <asp:LinkButton ID="lnkactualiza_excel" OnClientClick="return ModalShow('#myModalExcel');" CssClass="btn btn-primary btn-flat btng" runat="server" OnClick="lnkeditar_Click">
@@ -1064,12 +1064,14 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-lg-6 col-sm-6 col-xs-12">
                                     <h5><strong><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;Avance</strong></h5>
-                                    <telerik:RadTextBox ID="rtxtavance" runat="server" Skin="Bootstrap">
-
+                                    
+                                    <asp:TextBox ID="rtxtavance" CssClass=" form-control"  runat="server"  type="number" onkeypress="return validarEnteros(event);"
+                                         onpaste="return false;"></asp:TextBox>
+                                   <%-- <telerik:RadTextBox ID="rtxtavance" runat="server" Skin="Bootstrap" InputType="Number">
                                         <ClientEvents OnKeyPress="keyPressInteger" />
-                                    </telerik:RadTextBox>
+                                    </telerik:RadTextBox>--%>
                                 </div>
                             </div>
                         </div>
@@ -1117,7 +1119,7 @@
                                         <li>Se le recomienda utilizar el asistente de exportación de Microsoft Project para generar el archivo de CSV</li>
                                         <li>Si tiene dudas, contacte al administrador</li>
                                     </ul>
-                                    <asp:FileUpload ID="fuparchivos" runat="server" />
+                                    <asp:FileUpload ID="fuparchivos" runat="server"  onchange="return ValidateUF(this,5);" />
                                 </div>
                             </div>
                         </div>
@@ -1172,11 +1174,14 @@
                                     <h5><strong><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;Fecha</strong></h5>
                                     <telerik:RadDatePicker ID="rdtfechaentregable" runat="server" Width="100%" Skin="Bootstrap"></telerik:RadDatePicker>
                                 </div>
-                                <div class="col-lg-12">
+                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                     <h5><strong><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;% Avance</strong></h5>
-                                    <telerik:RadTextBox ID="rtxtavanceentregable" runat="server" Skin="Bootstrap" InputType="Number">
+                                    
+                                    <asp:TextBox ID="rtxtavanceentregable" CssClass=" form-control"  runat="server"  type="number" onkeypress="return validarEnteros(event);"
+                                         onpaste="return false;"></asp:TextBox>
+                                <%--    <telerik:RadTextBox ID="rtxtavanceentregable" runat="server" Skin="Bootstrap" InputType="Number">
                                         <ClientEvents OnKeyPress="keyPressInteger" />
-                                    </telerik:RadTextBox>
+                                    </telerik:RadTextBox>--%>
                                 </div>
                                 <asp:TextBox ID="txtid_entregable" Visible="false" runat="server"></asp:TextBox>
                             </div>
@@ -1250,9 +1255,12 @@
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                     <h5><strong><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;% Avance</strong></h5>
-                                    <telerik:RadTextBox ID="rtxtxavancetarea" InputType="Number" runat="server" Skin="Bootstrap">
+                                    
+                                    <asp:TextBox ID="rtxtxavancetarea" CssClass=" form-control"  runat="server"  type="number" onkeypress="return validarEnteros(event);"
+                                         onpaste="return false;"></asp:TextBox>
+                                 <%--   <telerik:RadTextBox ID="rtxtxavancetarea" InputType="Number" runat="server" Skin="Bootstrap">
                                         <ClientEvents OnKeyPress="keyPressInteger" />
-                                    </telerik:RadTextBox>
+                                    </telerik:RadTextBox>--%>
                                 </div>
                             </div>
                             <div class="row">
@@ -1385,7 +1393,7 @@
                                 </div>
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-file-archive-o" aria-hidden="true"></i>&nbsp;Seleccionar Documento</strong></h5>
-                                    <asp:FileUpload ID="fupDocumentos" runat="server" CssClass="form-control" />
+                                    <asp:FileUpload ID="fupDocumentos" runat="server" CssClass="form-control"  onchange="return ValidateUF(this,15);" />
                                 </div>
                                 <div class="col-lg-12">
                                     <br />
@@ -1785,10 +1793,18 @@
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <h5><strong><i class="fa fa-phone" aria-hidden="true"></i>&nbsp;Telefono</strong></h5>
-                                    <telerik:RadTextBox ID="rtxttelefonoinvo" runat="server" Skin="Bootstrap" Width="100%">
+                                    <telerik:RadTextBox ID="rtxttelefonoinvo" runat="server" Skin="Bootstrap" Width="100%" >
                                     </telerik:RadTextBox>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <h5><strong><i class="fa fa-mobile" aria-hidden="true"></i>&nbsp;Celular</strong></h5>
+                                    <asp:TextBox ID="rtxtcelularinvo" CssClass=" form-control"  runat="server"  type="number" onkeypress="return validarEnteros(event);"
+                                         onpaste="return false;"></asp:TextBox>
+                                   <%-- <telerik:RadTextBox ID="rtxtcelularinvo" runat="server" Skin="Bootstrap" Width="100%" InputType="Number">
+                                        <ClientEvents  OnBlur="keyPressInteger" />
+                                    </telerik:RadTextBox>--%>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12">
                                     <h5><strong><i class="fa fa-internet-explorer" aria-hidden="true"></i>&nbsp;Correo</strong></h5>
                                     <telerik:RadTextBox ID="rtxtcorreoinvo" runat="server" Skin="Bootstrap" Width="100%" InputType="Email"></telerik:RadTextBox>
                                 </div>
@@ -2087,7 +2103,7 @@
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-question-circle" aria-hidden="true"></i>&nbsp;Encuestas</strong></h5>
                                     <div class="input-group" id="div_cargaencuesta" runat="server">
-                                        <asp:FileUpload ID="fupencuestas" runat="server" CssClass=" form-control" />
+                                        <asp:FileUpload ID="fupencuestas" runat="server" CssClass=" form-control"  onchange="return ValidateUF(this,10);" />
                                         <span class="input-group-addon">
                                             <asp:LinkButton CommandName="encuestas" ID="lnksubirencuestas" OnClientClick="return ConfirmUploadEncuesta('¿Desea subir este archivo?')"
                                                 OnClick="lnksubirencuestas_Click" runat="server">
@@ -2116,7 +2132,7 @@
                                     <h5><strong><i class="fa fa-file" aria-hidden="true"></i>&nbsp;Documento de Cierre</strong></h5>
 
                                     <div class="input-group" id="div_cargacierre" runat="server">
-                                        <asp:FileUpload ID="fupdocierre" runat="server" CssClass=" form-control" />
+                                        <asp:FileUpload ID="fupdocierre" runat="server" CssClass=" form-control" onchange="return ValidateUF(this,10);" />
                                         <span class="input-group-addon">
                                             <asp:LinkButton CommandName="cierre" ID="lnkdoccierre" OnClick="lnksubirencuestas_Click" runat="server" OnClientClick="return ConfirmUploadCierre('¿Desea subir este archivo?');">                                        
                                             <i class="fa fa-upload" aria-hidden="true"></i>&nbsp;Subir
@@ -2144,7 +2160,7 @@
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-briefcase" aria-hidden="true"></i>&nbsp;Kit de Cierre</strong></h5>
                                     <div class="input-group" id="div_cargakit" runat="server">
-                                        <asp:FileUpload ID="fupkit" runat="server" CssClass=" form-control" />
+                                        <asp:FileUpload ID="fupkit" runat="server" CssClass=" form-control" onchange="return ValidateUF(this,10);" />
                                         <span class="input-group-addon">
                                             <asp:LinkButton CommandName="kit" ID="lnkkit" OnClick="lnksubirencuestas_Click" runat="server" OnClientClick="return ConfirmUploadKit('¿Desea subir este archivo?');">                                        
                                             <i class="fa fa-upload" aria-hidden="true"></i>&nbsp;Subir

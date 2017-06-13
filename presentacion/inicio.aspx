@@ -2,6 +2,7 @@
 
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+ 
     <script type="text/javascript">
         function ModalClose() {
             $('#myModalExcel').modal('hide');
@@ -15,6 +16,7 @@
                 return false;
             }
         }
+       
     </script>
     <style type="text/css">
         .small-box .icon {
@@ -27,6 +29,12 @@
             z-index: 0;
             font-size: 65px;
             color: white;
+        }
+        .rcbList li{
+            font-size: 10px;
+        }
+        .rcbCheckAllItems label{
+            font-size: 11px;
         }
     </style>
 </asp:Content>
@@ -59,53 +67,78 @@
 
         </div>
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <!-- TABLE: LATEST ORDERS -->
-            <div class="box box-danger">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Mis Proyectos</h3>
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                    </div>
-                </div>
-                <!-- /.box-header -->
-                <div class="box-body">
-                    <div class="table-responsive">
-                        <table class="table no-margin">
-                            <thead>
-                                <tr>
-                                    <th>Proyecto</th>
-                                    <th style="text-align: center;">Planeación</th>
-                                    <th style="text-align: center;">Ejecución</th>
-                                    <th style="text-align: center;">Cierre</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <asp:Repeater ID="repeat_mis_proyectos" runat="server">
-                                    <ItemTemplate>
+        <asp:UpdatePanel ID="UODATA" runat="server" UpdateMode="Always">
+            <ContentTemplate>
+
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                    <!-- TABLE: LATEST ORDERS -->
+                    <div class="box box-danger">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Proyectos</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div class="row" id="div_combo_pm_x_proyecto" runat="server" visible="false">
+                                <div class="col-lg-4 col-md-2 hidden-sm hidden-xs"></div>
+                                <div style="text-align: right;" class="col-lg-8 col-md-10 col-sm-12 col-xs-12" >
+                                   
+                                    <telerik:RadComboBox RenderMode="Lightweight" ID="ddlpm_x_proyecto" runat="server" CheckBoxes="true"
+                                        EnableCheckAllItemsCheckBox="true" style="font-size:11px;" EmptyMessage="Filtrar por PM"
+                                        Width="88%" Skin="Bootstrap" Localization-AllItemsCheckedString="Todos los PM seleccionados"
+                                        Localization-NoMatches="No hay resultados" OnItemChecked="ddlpm_x_proyecto_ItemChecked" Localization-CheckAllString="Seleccionar todos" Localization-ItemsCheckedString="PM selecionado(s)">
+                                  
+                                    </telerik:RadComboBox>
+                                    <span>
+                                    <asp:LinkButton Style="font-size: 11px" ID="lnkfiltro" Width="10%" runat="server" OnClick="lnkfiltro_Click" CssClass="btn btn-primary btn-sm"><i class="fa fa-search" aria-hidden="true"></i></asp:LinkButton>
+                                    <%--  <asp:DropDownList ID="ddlpm_x_proyecto" Width="200px" CssClass="btn btn-default btn-flat right" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlpm_x_proyecto_SelectedIndexChanged"></asp:DropDownList>
+                                    --%></span>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table no-margin">
+                                    <thead>
                                         <tr>
-                                            <td><a href='<%# "proyecto_general.aspx?id_proyecto="+ presentacion.funciones.deTextoa64(Eval("id_proyecto").ToString()) %>'><%# Eval("proyecto") %></a></td>
-                                            <td style="text-align: center;"><%# Eval("Planeación") %></td>
-                                            <td style="text-align: center;"><%# Eval("Ejecución") %></td>
-                                            <td style="text-align: center;"><%# Eval("Cierre") %></td>
+                                            <th>Proyecto</th>
+                                            <th style="text-align: center; width: 60px;">Planeación</th>
+                                            <th style="text-align: center; width: 60px;">Ejecución</th>
+                                            <th style="text-align: center; width: 60px;">Cierre</th>
+                                            <th id="th_pm" runat="server" visible="true" style="text-align: left; width: 200px;">PM</th>
                                         </tr>
-                                    </ItemTemplate>
-                                </asp:Repeater>
-                            </tbody>
-                        </table>
+                                    </thead>
+                                    <tbody>
+                                        <asp:Repeater ID="repeat_mis_proyectos" runat="server">
+                                            <ItemTemplate>
+                                                <tr>
+                                                    <td><a href='<%# "proyecto_general.aspx?id_proyecto="+ presentacion.funciones.deTextoa64(Eval("id_proyecto").ToString()) %>'><%# Eval("proyecto") %></a></td>
+                                                    <td style="text-align: center;"><%# Eval("Planeación") %></td>
+                                                    <td style="text-align: center;"><%# Eval("Ejecución") %></td>
+                                                    <td style="text-align: center;"><%# Eval("Cierre") %></td>
+                                                    <td id="td_pm" runat="server" visible='<%# Convert.ToBoolean(Eval("view_pm_filters"))%>' 
+                                                        style="text-align: left; font-size:10px;"><%# Eval("PM") %></td>
+                                                </tr>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="box-footer clearfix">
+                            <a href="javascript:void(0)" class="btn btn-sm btn-primary btn-flat pull-left" onclick="return ModalShow('#myModalExcel');" id="nvoproyect" runat="server">Agregar Proyecto</a>
+                            <a href="catalogo_proyectos.aspx" class="btn btn-sm btn-default btn-flat pull-right">Todos los Proyectos</a>
+                        </div>
+                        <!-- /.box-footer -->
                     </div>
-                    <!-- /.table-responsive -->
                 </div>
-                <!-- /.box-body -->
-                <div class="box-footer clearfix">
-                    <a href="javascript:void(0)" class="btn btn-sm btn-primary btn-flat pull-left" onclick="return ModalShow('#myModalExcel');" id="nvoproyect" runat="server">Agregar Proyecto</a>
-                    <a href="catalogo_proyectos.aspx" class="btn btn-sm btn-default btn-flat pull-right">Todos Mis Proyectos</a>
-                </div>
-                <!-- /.box-footer -->
-            </div>
-        </div>
+            </ContentTemplate>
+        </asp:UpdatePanel>
     </div>
 
     <div class="modal fade bs-example-modal-lg" tabindex="-1" id="myModalExcel" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -131,7 +164,7 @@
                                         <li>Se le recomienda utilizar el asistente de exportación de Microsoft Project para generar el archivo de CSV</li>
                                         <li>Si tiene dudas, contacte al administrador</li>
                                     </ul>
-                                    <asp:FileUpload ID="fuparchivos" runat="server" />
+                                    <asp:FileUpload ID="fuparchivos" runat="server" onchange="ValidateUF(this,5);" />
                                     </div>
                             </div>
                              <div class="row" id="div_proyecto_manual" runat="server" visible="false">

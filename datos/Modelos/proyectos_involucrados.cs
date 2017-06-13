@@ -31,7 +31,10 @@ namespace datos.Modelos
         [StringLength(250)]
         public string telefono { get; set; }
 
-        [StringLength(50)]
+        [StringLength(250)]
+        public string celular { get; set; }
+
+        [StringLength(250)]
         public string correo { get; set; }
 
         [Required]

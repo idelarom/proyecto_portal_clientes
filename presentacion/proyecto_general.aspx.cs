@@ -47,36 +47,47 @@ namespace presentacion
             tab_docs.Attributes["class"] = "tab-pane";
             tab_com.Attributes["class"] = "tab-pane";
             tab_admin.Attributes["class"] = "tab-pane";
+            //CargarListadoEmpleados("");
+            CargarGrafica(id_proyecto);
+            CargarEntregables(id_proyecto);
+            CargarTareas(id_proyecto);
+            CargarDocumentos(id_proyecto);
             switch (tab.ToLower())
             {
+                //tab informacion general
                 case "tinfo":
                 default:
                     tinfo.Attributes["class"] = "active";
                     tab_info.Attributes["class"] = "tab-pane active";
                     break;
-
+                //tab involucrados
                 case "tinvo":
+                    CargarComboRoles();
                     CargarDiagramas();
                     tinvo.Attributes["class"] = "active";
                     tab_invo.Attributes["class"] = "tab-pane active";
                     break;
-
+                //tab minutas
                 case "tmin":
+                    CargarInvolucrado(id_proyecto);
+                    CargarMinutas(id_proyecto);
                     tmin.Attributes["class"] = "active";
                     tab_minu.Attributes["class"] = "tab-pane active";
                     break;
-
+                //tab documentos
                 case "tdoc":
                     tdoc.Attributes["class"] = "active";
                     tab_docs.Attributes["class"] = "tab-pane active";
                     break;
-
+                //tab comunicacion
                 case "tcomun":
+                    CargarCorreos(id_proyecto);
                     tcomun.Attributes["class"] = "active";
                     tab_com.Attributes["class"] = "tab-pane active";
                     break;
-
+                //tab administracion
                 case "tadmin":
+                    CargarEmpleadosProyecto(id_proyecto);
                     tadmin.Attributes["class"] = "active";
                     tab_admin.Attributes["class"] = "tab-pane active";
                     break;
@@ -128,7 +139,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"])).Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
                 if (dt.Rows.Count > 0)
                 {
                     DataRow row = dt.Rows[0];
@@ -160,24 +171,17 @@ namespace presentacion
                         rdtpinicio.SelectedDate = Convert.ToDateTime(row["fecha_inicio"]);
                         rdtpfin.SelectedDate = Convert.ToDateTime(row["fecha_fin"]);
                     }
-                    bool es_cliente = Convert.ToBoolean(Session["cliente"]);
-                    if (!es_cliente)
+                  
+                    if (Request.QueryString["tab"] == null)
                     {
-                        CargarCorreosCliente();
+                        VisibleTab("tinfo");
                     }
                     else
                     {
+                        VisibleTab(Request.QueryString["tab"]);
                     }
-                    //CargarListadoEmpleados("");
-                    CargarComboRoles();
-                    CargarEntregables(id_proyecto);
-                    CargarDocumentos(id_proyecto);
-                    CargarCorreos(id_proyecto);
-                    CargarTareas(id_proyecto);
-                    CargarMinutas(id_proyecto);
-                    CargarInvolucrado(id_proyecto);
-                    CargarEmpleadosProyecto(id_proyecto);
-                    CargarGrafica(id_proyecto);
+
+                    
                 }
                 else
                 {
@@ -448,7 +452,6 @@ namespace presentacion
                     string[] return_array = entregables.Agregar(entidad);
                     vmensaje = return_array[0];
                 }
-                funciones.ActualizaAvances();
                 return vmensaje;
             }
             catch (Exception ex)
@@ -516,7 +519,6 @@ namespace presentacion
                     entidad.usuario_edicion = Session["usuario"] as string;
                     vmensaje = entregables.Editar(entidad);
                 }
-                funciones.ActualizaAvances();
                 return vmensaje;
             }
             catch (Exception ex)
@@ -583,7 +585,6 @@ namespace presentacion
                     ProyectosCOM proyecto_ = new ProyectosCOM();
                     vmensaje = proyecto_.Editar(entidad);
                 }
-                funciones.ActualizaAvances();
                 return vmensaje;
             }
             catch (Exception ex)
@@ -1377,27 +1378,31 @@ namespace presentacion
                 {
                     DateTime fecha = Convert.ToDateTime(row["fecha"]);
                     int avance = Convert.ToInt32(row["avance"]);
-                    if (avance < 30)
-                    {
-                        //azul
-                        colores = colores + "'#1565c0',";
-                    }
-                    else if (avance < 80 && avance > 30)
-                    {
-                        //amarillo
-                        colores = colores + "'#ffeb3b',";
-                    }
-                    else if (avance > 80)
-                    {
-                        //azul
-                        colores = colores + "'#00897b',";
-                    }
+
 
 
                     if (avance < 100 && DateTime.Now > fecha)
                     {
                         //rojo
                         colores = colores + "'#C42C2C',";
+                    }
+                    else {
+
+                        if (avance < 30)
+                        {
+                            //azul
+                            colores = colores + "'#1565c0',";
+                        }
+                        else if (avance < 80 && avance > 30)
+                        {
+                            //amarillo
+                            colores = colores + "'#ffeb3b',";
+                        }
+                        else if (avance > 80)
+                        {
+                            //azul
+                            colores = colores + "'#00897b',";
+                        }
                     }
                 }
                 colores = colores.TrimEnd(',');
@@ -1411,10 +1416,6 @@ namespace presentacion
                             + "data: {"
                             + "table: 'ContentPlaceHolder1_grid_entregables_hide'"
                             + "},"
-                            + "yAxis: {"
-                               + "max: 100,"
-                               + "min:0"
-                          + " },"
                             + "chart: {"
                             + "type: 'column'"
                             + " },"
@@ -1422,6 +1423,8 @@ namespace presentacion
                             + "     text: ''"
                             + " },"
                             + "  yAxis: {"
+                               + "max: 100,"
+                               + "min:0,"
                             + "      allowDecimals: false,"
                             + "      title: {"
                             + "          text: title"
@@ -1485,14 +1488,7 @@ namespace presentacion
                     ViewState["pendiente_descripcion"] = null;
                     CargarProyectos(id_proyecto, usuario, Convert.ToBoolean(Session["administrador"]));
                     funciones.ActualizaAvances();
-                    if (Request.QueryString["tab"] == null)
-                    {
-                        VisibleTab("tinfo");
-                    }
-                    else
-                    {
-                        VisibleTab(Request.QueryString["tab"]);
-                    }
+                 
                     Boolean cliente = Convert.ToBoolean(Session["cliente"]);
                     lnkguardarcliente.Visible = !cliente;
                     //lnkeliminarinvolucrado.Visible = !cliente;
@@ -2507,6 +2503,7 @@ namespace presentacion
                     entidad.nombre = rtxtnombreinvo.Text;
                     if (txtno_empleado.Text != "") { entidad.no_empleado = Convert.ToInt32(txtno_empleado.Text); }
                     entidad.telefono = rtxttelefonoinvo.Text;
+                    entidad.celular = rtxtcelularinvo.Text;
                     entidad.correo = rtxtcorreoinvo.Text;
                     entidad.id_rol = Convert.ToInt32(ddlrol.SelectedValue);
                     entidad.usuario = Session["usuario"] as string;
@@ -2554,6 +2551,7 @@ namespace presentacion
                     txtid_invo.Text = hdfid_involucrado.Value.Trim();
                     rtxtnombreinvo.Text = dt.Rows[0]["nombre"].ToString();
                     rtxttelefonoinvo.Text = dt.Rows[0]["telefono"].ToString();
+                    rtxtcelularinvo.Text = dt.Rows[0]["celular"].ToString();
                     rtxtcorreoinvo.Text = dt.Rows[0]["correo"].ToString();
                     ddlrol.SelectedValue = dt.Rows[0]["id_rol"].ToString();
                     txtno_empleado.Text = dt.Rows[0]["no_empleado"].ToString();
@@ -3055,7 +3053,6 @@ namespace presentacion
                     //aqui es we
                     if (correos_pm != "")
                     {
-
                         EnviarCorreo(correos_pm, "Asignación de Proyecto", "", 6);
                     }
                     string url = "proyecto_general.aspx?tab=tadmin&id_proyecto=" + Request.QueryString["id_proyecto"];

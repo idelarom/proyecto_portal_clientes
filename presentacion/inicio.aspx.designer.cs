@@ -31,6 +31,51 @@ namespace presentacion {
         protected global::System.Web.UI.WebControls.Repeater repeat_menu;
         
         /// <summary>
+        /// Control UODATA.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel UODATA;
+        
+        /// <summary>
+        /// Control div_combo_pm_x_proyecto.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl div_combo_pm_x_proyecto;
+        
+        /// <summary>
+        /// Control ddlpm_x_proyecto.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox ddlpm_x_proyecto;
+        
+        /// <summary>
+        /// Control lnkfiltro.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton lnkfiltro;
+        
+        /// <summary>
+        /// Control th_pm.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell th_pm;
+        
+        /// <summary>
         /// Control repeat_mis_proyectos.
         /// </summary>
         /// <remarks>

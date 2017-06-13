@@ -56,7 +56,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"])).Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
                 rdl_proyectos.DataTextField = "proyecto";
                 rdl_proyectos.DataValueField = "id_proyecto";
                 rdl_proyectos.DataSource = dt;

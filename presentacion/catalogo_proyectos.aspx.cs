@@ -90,7 +90,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"])).Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
                 DataRow row = dt.Rows[0];
                 txtid_proyecto.Text = id_proyecto.ToString();
                 rtxtproyecto.Text = row["proyecto"].ToString();
@@ -194,7 +194,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"])).Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
                 if (dt.Rows.Count > 0)
                 {
                     bool cliente = Convert.ToBoolean(Session["cliente"]);

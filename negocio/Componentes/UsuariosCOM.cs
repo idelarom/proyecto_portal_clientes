@@ -65,8 +65,7 @@ namespace negocio.Componentes
                     usuario.id_uperfil = entidad.id_uperfil;
                     usuario.fecha_edicion = DateTime.Now;
                     usuario.usuario_edicion = entidad.usuario_edicion;
-                    context.SaveChanges();
-                
+                    context.SaveChanges();                
                 return "";
             }
             catch (DbEntityValidationException ex)
@@ -82,7 +81,33 @@ namespace negocio.Componentes
                 return fullErrorMessage.ToString();
             }
         }
+        public string EditarImagen(usuarios entidad)
+        {
+            try
+            {
 
+                Model context = new Model();
+                usuarios usuario = context.usuarios
+                                .First(i => i.id_usuario == entidad.id_usuario);
+                usuario.img_profile = entidad.img_profile;
+                usuario.fecha_edicion = DateTime.Now;
+                usuario.usuario_edicion = entidad.usuario_edicion;
+                context.SaveChanges();
+                return "";
+            }
+            catch (DbEntityValidationException ex)
+            {
+                // Retrieve the error messages as a list of strings.
+                var errorMessages = ex.EntityValidationErrors
+                        .SelectMany(x => x.ValidationErrors)
+                        .Select(x => x.ErrorMessage);
+
+                // Join the list to a single string.
+                var fullErrorMessage = string.Join("; ", errorMessages);
+
+                return fullErrorMessage.ToString();
+            }
+        }
         public string Borrar(usuarios entidad)
         {
             try

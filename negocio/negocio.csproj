@@ -59,6 +59,7 @@
     <Compile Include="Componentes\MenuCOM.cs" />
     <Compile Include="Componentes\MinutasCOM.cs" />
     <Compile Include="Componentes\ProyectosCOM.cs" />
+    <Compile Include="Componentes\ReportesCOM.cs" />
     <Compile Include="Componentes\RolesCOM.cs" />
     <Compile Include="Componentes\TareasCOM.cs" />
     <Compile Include="Componentes\To.cs" />

@@ -281,6 +281,10 @@
                 .IsUnicode(false);
 
             modelBuilder.Entity<proyectos_involucrados>()
+                .Property(e => e.celular)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<proyectos_involucrados>()
                 .Property(e => e.correo)
                 .IsUnicode(false);
 
@@ -483,6 +487,10 @@
 
             modelBuilder.Entity<usuarios>()
                 .Property(e => e.password)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<usuarios>()
+                .Property(e => e.img_profile)
                 .IsUnicode(false);
 
             modelBuilder.Entity<usuarios>()

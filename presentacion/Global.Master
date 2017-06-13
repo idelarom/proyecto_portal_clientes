@@ -165,6 +165,15 @@
             n = String.fromCharCode(k);
             return patron.test(n);
         }
+
+        function keyPressInteger(sender, args) {
+            var text = sender.get_value() + args.get_keyCharacter();
+            if (!text.match('^[0-9]+$'))
+            {
+                args.set_cancel(true);
+            }
+        }
+
         //valida un correo
         function validarEmail(Object) {
             var valor = Object.value;
@@ -173,6 +182,35 @@
             }
             alert("La dirección de email " + valor + " es incorrecta.")
             return (false)
+        }
+        function ValidateUF(Object, size_max) {
+            var size = (Object.files[0].size) / 1000000;
+            if (size > size_max) {
+                Object.value = "";
+                swal("Mensaje del sistema", "El tamaño maximo para la subida de archivos es " + size_max + " mb.", "error");
+                return false;
+            } else {
+                return true;
+            }
+        } 
+
+        function ConfirmFotoPerfil(msg) {
+            if (confirm(msg)) {
+                $("#lnksubiendofotoperfil").show();
+                $("#lnksubirfotoperfil").hide();
+                return true;
+            } else {
+                return false;
+            }
+        }
+           function ConfirmGuardaConfig(msg) {
+            if (confirm(msg)) {
+                $("#lnkcargandotermina22").show();
+                $("#lnkguardarconfiguracion22").hide();
+                return true;
+            } else {
+                return false;
+            }
         }
     </script>
 </head>
@@ -213,7 +251,7 @@
                                 <ul class="dropdown-menu">
                                     <!-- User image -->
                                     <li class="user-header">
-                                        <asp:Image ID="imguser2" runat="server" class="img-circle" Visible="false" />
+                                        <asp:Image ID="imguser2" runat="server" class="img-circle"  ImageUrl="~/img/user.png" />
                                         <p>
                                             <asp:Label ID="lblname3" runat="server" Text="Label"></asp:Label>
                                             <small>
@@ -222,11 +260,14 @@
                                     </li>
                                     <!-- Menu Footer-->
                                     <li class="user-footer">
-                                        <div class="pull-left">
+                                        <div class="pull-left"><asp:LinkButton ID="lnkconfig" runat="server" CssClass="btn btn-default btn-flat" 
+                                             OnClientClick="ModalShow('#myModalUserConfig');" OnClick="lnkconfig_Click">
+                                            <i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Preferencias</asp:LinkButton>
                                         </div>
                                         <div class="pull-right">
                                             <asp:LinkButton ID="LinkButton1" runat="server" CssClass="btn btn-default btn-flat"
-                                                OnClientClick="return confirm('¿Desea Cerrar Sesión?');" OnClick="LinkButton1_Click">Cerrar Sesión</asp:LinkButton>
+                                                OnClientClick="return confirm('¿Desea Cerrar Sesión?');" OnClick="LinkButton1_Click">
+                                                <i class="fa fa-sign-out" aria-hidden="true"></i>Cerrar Sesión</asp:LinkButton>
                                         </div>
                                     </li>
                                 </ul>
@@ -240,9 +281,9 @@
                 <!-- sidebar: style can be found in sidebar.less -->
                 <section class="sidebar">
                     <!-- Sidebar user panel -->
-                    <div class="user-panel" style="display: none;">
-                        <div class="pull-left image" style="display: none;">
-                            <asp:Image ID="imguser3" runat="server" class="img-circle" />
+                    <div class="user-panel" >
+                        <div class="pull-left image">
+                            <asp:Image ID="imguser3" runat="server" class="img-circle"   ImageUrl="~/img/user.png"/>
                         </div>
                         <div class="pull-left info">
                             <p>
@@ -265,9 +306,10 @@
                 <telerik:RadScriptManager ID="RadScriptManager1" runat="server"></telerik:RadScriptManager>
 
                 <div id="div_load" runat="server" style="display: none; position: fixed; left: 0px; top: 30%; width: 100%; height: 100%; z-index: 9999;">
-                    <asp:Image ID="idid" Style="display: block; margin: 0 auto;"
+                        <asp:Image ID="idid" Style="display: block; margin: 0 auto;" Width="100px"
                         runat="server" ImageUrl="~/img/loading_2.gif" />
-                    <h3 style="text-align: center;">Cargando Información</h3>
+                    <h4 style="text-align: center;color:#C42C2C;font-weight:600;">Cargando Información
+                    <br/>Por favor, espere un momento.</h4>
                 </div>
                 <div class="content" id="div_content" runat="server">
 
@@ -277,6 +319,70 @@
                 <!-- /.content -->
             </div>
         </div>
+        
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" id="myModalUserConfig" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="lnkconfig" EventName="Click" />
+                    <asp:PostBackTrigger ControlID="lnksubirfotoperfil" />
+                </Triggers>
+                <ContentTemplate>
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title">Preferencia de Usuario</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h4><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Foto de Perfil</strong></h4>
+                                    <label>Puede cambiar la foto de su perfil para este sistema</label>
+                                     <div class="input-group" >
+                                        <asp:FileUpload ID="fupfotoperfil" runat="server" CssClass=" form-control"  onchange="return ValidateUF(this,2);" />
+                                        <span class="input-group-addon">
+                                            <asp:LinkButton CommandName="encuestas" ID="lnksubirfotoperfil" OnClientClick="return ConfirmFotoPerfil('¿Desea cambiar la imagen de su perfil?')"
+                                                OnClick="lnksubirfotoperfil_Click" runat="server">
+                                            <i class="fa fa-upload" aria-hidden="true"></i>&nbsp;Subir
+                                            </asp:LinkButton>
+                                            <asp:LinkButton ID="lnksubiendofotoperfil" OnClientClick="return false;" runat="server" Style="display: none;">
+                                            <i class="fa fa-refresh fa-spin fa-fw"></i>&nbsp;Subiendo
+                                            </asp:LinkButton>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" id="contraseña" runat="server">
+                                    <h4><strong><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Contraseña</strong></h4>
+                                    <telerik:RadTextBox ID="rtxtcontraseña" Width="100%" runat="server" Skin="Bootstrap"></telerik:RadTextBox>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer ">
+                            <div class="row" id="div_errormodal" runat="server" visible="false">
+
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        <asp:Label ID="lblerrormodal" runat="server" Text=""></asp:Label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
+                               <asp:LinkButton OnClientClick="return false;" ID="lnkcargandotermina22" CssClass="btn btn-danger btn-flat" runat="server" Style="display: none;">
+                                            <i class="fa fa-refresh fa-spin fa-fw"></i>
+                                            <span class="sr-only">Loading...</span>&nbsp;Guardando Configuración...
+                            </asp:LinkButton>
+                            <asp:LinkButton ID="lnkguardarconfiguracion22" OnClientClick="return confirm('¿Desea Guardar los cambios?');"
+                                CssClass="btn btn-primary btn-flat" runat="server" OnClick="lnkguardarconfiguracion_Click">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Guardar
+                            </asp:LinkButton>
+                        </div>
+                    </div>
+                </ContentTemplate>
+            </asp:UpdatePanel>
+        </div>
+    </div>
     </form>
 </body>
 </html>

@@ -131,13 +131,6 @@
                                     <%# Eval("Planeación") %>
                                 </ItemTemplate>
                             </telerik:GridTemplateColumn>
-                            <telerik:GridTemplateColumn HeaderText="Diseño">
-                                <HeaderStyle Width="30px" />
-                                <ItemStyle HorizontalAlign="Center" />
-                                <ItemTemplate>
-                                    <%# Eval("Diseño") %>
-                                </ItemTemplate>
-                            </telerik:GridTemplateColumn>
                             <telerik:GridTemplateColumn HeaderText="Ejecución">
                                 <HeaderStyle Width="30px" />
                                 <ItemStyle HorizontalAlign="Center" />
@@ -150,6 +143,13 @@
                                 <ItemStyle HorizontalAlign="Center" />
                                 <ItemTemplate>
                                     <%# Eval("Cierre") %>
+                                </ItemTemplate>
+                            </telerik:GridTemplateColumn>
+                            <telerik:GridTemplateColumn HeaderText="PM">
+                                <HeaderStyle Width="200px" />
+                                <ItemStyle HorizontalAlign="Left" />
+                                <ItemTemplate>
+                                    <%# Eval("pm") %>
                                 </ItemTemplate>
                             </telerik:GridTemplateColumn>
                         </Columns>
@@ -246,7 +246,7 @@
                                         <li>Se le recomienda utilizar el asistente de exportación de Microsoft Project para generar el archivo de CSV</li>
                                         <li>Si tiene dudas, contacte al administrador</li>
                                     </ul>
-                                    <asp:FileUpload ID="fuparchivos" runat="server" />
+                                    <asp:FileUpload ID="fuparchivos" runat="server"  onchange="return ValidateUF(this,5);" />
                                 </div>
                             </div>
                         </div>

@@ -1234,6 +1234,7 @@
     <Content Include="primitive\primitives.latest.css" />
     <Content Include="primitive\primitives.min.js" />
     <Content Include="proyecto_general.aspx" />
+    <Content Include="reporte_proyectos.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1312,6 +1313,13 @@
     </Compile>
     <Compile Include="proyecto_general.aspx.designer.cs">
       <DependentUpon>proyecto_general.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="reporte_proyectos.aspx.cs">
+      <DependentUpon>reporte_proyectos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="reporte_proyectos.aspx.designer.cs">
+      <DependentUpon>reporte_proyectos.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -1475,7 +1483,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="documentation\" />
-    <Folder Include="files\" />
+    <Folder Include="files\users\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

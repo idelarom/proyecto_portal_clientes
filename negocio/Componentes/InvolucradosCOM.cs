@@ -86,6 +86,7 @@ namespace negocio.Componentes
                     id_rol = entidad.id_rol,
                     nombre = entidad.nombre,
                     telefono = entidad.telefono,
+                    celular=entidad.celular,
                     no_empleado = entidad.no_empleado,
                     correo = entidad.correo,
                     usuario = entidad.usuario,
@@ -121,6 +122,7 @@ namespace negocio.Componentes
                 involucrado.telefono = entidad.telefono;
                 involucrado.no_empleado = entidad.no_empleado;
                 involucrado.correo = entidad.correo;
+                involucrado.celular = entidad.celular;
                 involucrado.usuario_edicion = entidad.usuario_edicion;
                 involucrado.fecha_edicion = DateTime.Now;
                 context.SaveChanges();
@@ -290,6 +292,11 @@ namespace negocio.Componentes
                 Model context = new Model();
                 DataTable dt_tareas = GetPM(entidad);
                 bool exists = false;
+                ProyectosCOM proyectos = new ProyectosCOM();
+                DataTable ListadoEmpleadoProyecto = proyectos.ListadoEmpleadoProyecto(entidad.id_proyecto).Tables[0];
+                DataTable dt_filter = ListadoEmpleadoProyecto.Select("no_ = "+entidad.no_+"").CopyToDataTable().Rows.Count > 0? 
+                                                                                ListadoEmpleadoProyecto.Select("no_ = " + entidad.no_ + "").CopyToDataTable()
+                                                                                : new DataTable();
                 if (dt_tareas.Rows.Count > 0)
                 {
                     proyectos_empleados contacto = context.proyectos_empleados
@@ -299,6 +306,10 @@ namespace negocio.Componentes
                     contacto.comentarios_borrado = null;
                     contacto.usuario_borrado = null;
                     context.SaveChanges();
+                    exists = true;
+                }
+                else if (dt_filter.Rows.Count > 0)
+                {
                     exists = true;
                 }
                 return exists;
@@ -329,6 +340,7 @@ namespace negocio.Componentes
                                 {
                                     u.id_pinvolucrado,
                                     u.id_proyecto,
+                                    u.celular,
                                     u.id_rol,
                                     u.nombre,
                                     u.no_empleado,

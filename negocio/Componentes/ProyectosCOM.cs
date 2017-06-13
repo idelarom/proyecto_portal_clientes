@@ -219,7 +219,40 @@ namespace negocio.Componentes
             return ds;
         }
 
-        public DataSet sp_get_proyects_info(int id_proyecto, string usuario, bool administrador, int id_cliente)
+        public DataSet sp_combo_pm_x_proyecto()
+        {
+            DataSet ds = new DataSet();
+            List<SqlParameter> listparameters = new List<SqlParameter>();
+            Datos data = new Datos();
+            try
+            {
+                //ds = data.datos_Clientes(listparameters);
+                ds = data.enviar("sp_combo_pm_x_proyecto", listparameters, false, 1);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return ds;
+        }
+
+        public DataSet sp_COMBO_CLIENTES_PROYECTOS()
+        {
+            DataSet ds = new DataSet();
+            List<SqlParameter> listparameters = new List<SqlParameter>();
+            Datos data = new Datos();
+            try
+            {
+                //ds = data.datos_Clientes(listparameters);
+                ds = data.enviar("sp_COMBO_CLIENTES_PROYECTOS", listparameters, false, 1);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return ds;
+        }
+        public DataSet sp_get_proyects_info(int id_proyecto, string usuario, bool administrador, int id_cliente, string usuario_filtro)
         {
             DataSet ds = new DataSet();
             List<SqlParameter> listparameters = new List<SqlParameter>();
@@ -228,6 +261,7 @@ namespace negocio.Componentes
             listparameters.Add(new SqlParameter() { ParameterName = "@pusuario", SqlDbType = SqlDbType.Int, Value = usuario });
             listparameters.Add(new SqlParameter() { ParameterName = "@padministrador", SqlDbType = SqlDbType.Bit, Value = administrador });
             listparameters.Add(new SqlParameter() { ParameterName = "@pid_cliente", SqlDbType = SqlDbType.Bit, Value = id_cliente });
+            listparameters.Add(new SqlParameter() { ParameterName = "@pusuario_filtro", SqlDbType = SqlDbType.VarChar, Value = usuario_filtro });
             try
             {
                 //ds = data.datos_Clientes(listparameters);

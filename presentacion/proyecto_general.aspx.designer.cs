@@ -532,7 +532,7 @@ namespace presentacion {
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::Telerik.Web.UI.RadTextBox rtxtavance;
+        protected global::System.Web.UI.WebControls.TextBox rtxtavance;
         
         /// <summary>
         /// Control div_errormodal.
@@ -649,7 +649,7 @@ namespace presentacion {
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::Telerik.Web.UI.RadTextBox rtxtavanceentregable;
+        protected global::System.Web.UI.WebControls.TextBox rtxtavanceentregable;
         
         /// <summary>
         /// Control txtid_entregable.
@@ -775,7 +775,7 @@ namespace presentacion {
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::Telerik.Web.UI.RadTextBox rtxtxavancetarea;
+        protected global::System.Web.UI.WebControls.TextBox rtxtxavancetarea;
         
         /// <summary>
         /// Control rtxtrecursos.
@@ -1433,6 +1433,15 @@ namespace presentacion {
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox rtxttelefonoinvo;
+        
+        /// <summary>
+        /// Control rtxtcelularinvo.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox rtxtcelularinvo;
         
         /// <summary>
         /// Control rtxtcorreoinvo.

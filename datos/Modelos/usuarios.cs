@@ -22,6 +22,9 @@ namespace datos.Modelos
         [StringLength(250)]
         public string password { get; set; }
 
+        [StringLength(8000)]
+        public string img_profile { get; set; }
+
         public DateTime fecha_registro { get; set; }
 
         [StringLength(50)]
