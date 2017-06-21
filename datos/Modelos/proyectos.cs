@@ -28,6 +28,9 @@ namespace datos.Modelos
         [StringLength(20)]
         public string codigo_proyecto { get; set; }
 
+        [StringLength(10)]
+        public string folio_pmt { get; set; }
+
         public int? id_cliente { get; set; }
 
         [Required]

@@ -45,22 +45,22 @@ namespace presentacion
                 bool retur = true;
                 if (usuario == "")
                 {
-                    Alert.ShowAlertInfo("Ingrese Usuario", "Mensaje del Sistema", this);
+                    Toast.Info("Ingrese Usuario", "Mensaje del Sistema", this);
                     retur = false;
                 }
-                if (password == "")
+                else if (password == "")
                 {
-                    Alert.ShowAlertInfo("Ingrese Contraseña", "Mensaje del Sistema", this);
+                    Toast.Info("Ingrese Contraseña", "Mensaje del Sistema", this);
                     retur = false;
                 }
-                if (Request.QueryString["c"] != null && !LoginActiveCliente(usuario, password, rtxtdominio.Text.Trim()))
+                else if (Request.QueryString["c"] != null && !LoginActiveCliente(usuario, password, rtxtdominio.Text.Trim()))
                 {
-                    Alert.ShowAlertInfo("Credenciales Invalidas", "Mensaje del Sistema", this);
+                    Toast.Error("Credenciales Invalidas", this);
                     retur = false;
                 }
-                if (Request.QueryString["c"] == null && !LoginActive(usuario, password, rtxtdominio.Text.Trim()))
+                else if(Request.QueryString["c"] == null && !LoginActive(usuario, password, rtxtdominio.Text.Trim()))
                 {
-                    Alert.ShowAlertInfo("Credenciales Invalidas", "Mensaje del Sistema", this);
+                    Toast.Error("Credenciales Invalidas", this);
                     retur = false;
                 }
                 return retur;
@@ -86,6 +86,9 @@ namespace presentacion
                     Session["usuario"] = username;
                     Session["password"] = password;
 
+
+                    Session["vista_arbol_mapa_tareas"] = dt_usuario.Rows.Count > 0 ? Convert.ToBoolean(row["vista_arbol_mapa_tareas"]) : true;
+                    Session["vista_grafica_milestones"] = dt_usuario.Rows.Count > 0 ? Convert.ToBoolean(row["vista_grafica_milestones"]) : true;
                     bool admin = dt_usuario.Rows.Count > 0 ? Convert.ToBoolean(dt_usuario.Rows[0]["administrador"]) : false;
                     DataTable dt_info = clientes.ListadoClientes(id_cliente).Tables[0];
                     Session["nombre"] = dt_info.Rows.Count > 0 ? dt_info.Rows[0]["Razon_social"].ToString() : "";
@@ -127,7 +130,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Error al actualizar los datos del usuario. " + ex.ToString(), this.Page);
+                Toast.Error("Error al actualizar los datos del usuario. " + ex.Message, this.Page);
             }
         }
 
@@ -146,7 +149,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -194,6 +197,8 @@ namespace presentacion
                         }
                         bool admin = dt_usuario.Rows.Count > 0 ? Convert.ToBoolean(dt_usuario.Rows[0]["administrador"]) : false; 
                         Session["usuario"] = username;
+                        Session["vista_arbol_mapa_tareas"] = dt_usuario.Rows.Count > 0 ? Convert.ToBoolean(dt_usuario.Rows[0]["vista_arbol_mapa_tareas"]) : true;
+                        Session["vista_grafica_milestones"] = dt_usuario.Rows.Count > 0 ? Convert.ToBoolean(dt_usuario.Rows[0]["vista_grafica_milestones"]) : true;
                         Session["password"] = password;
                         Session["contraseña"] = password;
                         Session["nombre"] = nombre_user;

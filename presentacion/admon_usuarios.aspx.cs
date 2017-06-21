@@ -28,16 +28,16 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
 
-        private void CargarTiposUsuarios(int id_tipo)
+        private void CargarTiposUsuarios(int id_tipo, bool cliente)
         {
             try
             {
                 UsuariosCOM usuarios = new UsuariosCOM();
-                DataTable dt = usuarios.GetTiposUsuariosClientes();
+                DataTable dt = cliente ? usuarios.GetTiposUsuariosClientes(): usuarios.GetTiposUsuarios();
                 ddltipos_usuarios.DataValueField = "id_uperfil";
                 ddltipos_usuarios.DataTextField = "perfil";
                 ddltipos_usuarios.DataSource = dt;
@@ -47,7 +47,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Erro al cargar lista de tipos de usuarios: " + ex.ToString(), this);
+                Toast.Error("Error al cargar lista de tipos de usuarios: " + ex.Message, this);
             }
         }
 
@@ -56,7 +56,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"",false).Tables[0];
                 rdl_proyectos.DataTextField = "proyecto";
                 rdl_proyectos.DataValueField = "id_proyecto";
                 rdl_proyectos.DataSource = dt;
@@ -64,7 +64,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
 
@@ -98,7 +98,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -136,7 +136,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -168,7 +168,7 @@ namespace presentacion
         protected void lnkagregar_Click(object sender, EventArgs e)
         {
             txtid_usuario.Text = "";
-            CargarTiposUsuarios(0);
+            CargarTiposUsuarios(0,true);
             CargarProyectos(0, Session["usuario"] as string, Convert.ToBoolean(Session["administrador"]));
             rtxtcontra.Text = "";
             rtxtusuario.Text = "";
@@ -230,7 +230,6 @@ namespace presentacion
                 usuarios_proyectos entidad_p2 = new usuarios_proyectos();
                 if (command == "Editar")
                 {
-                    CargarTiposUsuarios(0);
                     CargarProyectos(0, Session["usuario"] as string, Convert.ToBoolean(Session["administrador"]));
                     rtxtcontra.Text = "";
                     rtxtusuario.Text = "";
@@ -238,6 +237,8 @@ namespace presentacion
                     txtid_usuario.Text = id_usuario.ToString().Trim();
                     rtxtcontra.Text = funciones.de64aTexto(dt_rol.Rows[0]["password"].ToString().Trim());
                     rtxtusuario.Text = dt_rol.Rows[0]["usuario"].ToString().Trim();
+                    bool cliente = dt_rol.Rows[0]["id_cliente"].ToString() !="";
+                    CargarTiposUsuarios(0,cliente);
                     ddltipos_usuarios.SelectedValue = dt_rol.Rows[0]["id_uperfil"].ToString().Trim();
                     entidad_p2.id_usuario = id_usuario;
                     DataTable dt_proyectos = usuarios.GetUsersinProyects(entidad_p2);
@@ -266,13 +267,13 @@ namespace presentacion
                     }
                     else
                     {
-                        Alert.ShowAlertError(vmensaje, this);
+                        Toast.Error(vmensaje, this);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
 

@@ -35,7 +35,7 @@ namespace presentacion
         {
             if (rfinicio.Text == "" || rfin.Text == "")
             {
-                Alert.ShowAlertError("Ingrese la Fecha de inicio y la fecha de fin.",this);
+                Toast.Error("Ingrese la Fecha de inicio y la fecha de fin.",this);
             }
             else {
 
@@ -84,7 +84,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
 
@@ -101,7 +101,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
         private void CargarProyectos(string usuario, bool administrador, string usuario_filtro, int id_cliente, DateTime f_inicio, DateTime f_fin, 
@@ -132,7 +132,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
     }

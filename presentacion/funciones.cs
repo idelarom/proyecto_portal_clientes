@@ -14,6 +14,30 @@ namespace presentacion
     /// </summary>
     public class funciones
     {
+        public static void Download(string path, string file_name, Page page)
+        {
+            if (!File.Exists(path))
+            {
+                Alert.ShowAlertError("No tiene archivo relacionado", page);
+            }
+            else
+            {
+                // Limpiamos la salida
+                page.Response.Clear();
+                // Con esto le decimos al browser que la salida sera descargable
+                page.Response.ContentType = "application/octet-stream";
+                // esta linea es opcional, en donde podemos cambiar el nombre del fichero a descargar (para que sea diferente al original)
+                page.Response.AddHeader("Content-Disposition", "attachment; filename=" + file_name);
+                // Escribimos el fichero a enviar
+                page.Response.WriteFile(path);
+                // volcamos el stream
+                page.Response.Flush();
+                // Enviamos todo el encabezado ahora
+                page.Response.End();
+                // Response.End();
+            }
+        }
+
         public static String SplitLastIndex(string value, char separator)
         {
             if (value.Split(' ').Length > 1)

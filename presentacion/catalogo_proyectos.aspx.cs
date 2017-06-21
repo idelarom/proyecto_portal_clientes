@@ -81,7 +81,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -90,7 +90,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"",false).Tables[0];
                 DataRow row = dt.Rows[0];
                 txtid_proyecto.Text = id_proyecto.ToString();
                 rtxtproyecto.Text = row["proyecto"].ToString();
@@ -104,7 +104,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Alert.ShowAlertError(ex.Message, this);
             }
         }
 
@@ -186,7 +186,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
         private void CargarProyectos(string usuario, bool administrador)
@@ -194,7 +194,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"",false).Tables[0];
                 if (dt.Rows.Count > 0)
                 {
                     bool cliente = Convert.ToBoolean(Session["cliente"]);
@@ -206,7 +206,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Alert.ShowAlertError(ex.Message, this);
             }
         }
 
@@ -337,7 +337,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errormodal2.Visible = true;
-                lblerrormodal2.Text = ex.ToString();
+                lblerrormodal2.Text = ex.Message;
                 ModalShow("#myModalExcel");
             }
         }
@@ -407,7 +407,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -509,7 +509,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errormodal2.Visible = true;
-                lblerrormodal2.Text = ex.ToString();
+                lblerrormodal2.Text = ex.Message;
                 ModalShow("#myModalExcel");
             }
             finally

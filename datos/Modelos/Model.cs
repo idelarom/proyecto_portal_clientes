@@ -57,6 +57,11 @@
                 .IsUnicode(false);
 
             modelBuilder.Entity<proyectos>()
+                .Property(e => e.folio_pmt)
+                .IsFixedLength()
+                .IsUnicode(false);
+
+            modelBuilder.Entity<proyectos>()
                 .Property(e => e.proyecto)
                 .IsUnicode(false);
 

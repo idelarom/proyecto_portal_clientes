@@ -1321,6 +1321,7 @@
     <Compile Include="reporte_proyectos.aspx.designer.cs">
       <DependentUpon>reporte_proyectos.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Toast.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -1457,6 +1458,7 @@
     <Content Include="bin\ApplicationInsights.config" />
     <Content Include="bin\presentacion.dll.config" />
     <Content Include="primitive\codemirror\LICENSE" />
+    <Content Include="documentation\manual_usuario.pdf" />
     <None Include="Properties\PublishProfiles\proyectos.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -1482,7 +1484,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="documentation\" />
     <Folder Include="files\users\" />
   </ItemGroup>
   <PropertyGroup>

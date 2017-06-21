@@ -33,7 +33,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
 
@@ -70,7 +70,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -109,7 +109,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
         protected void Page_Load(object sender, EventArgs e)
@@ -156,13 +156,13 @@ namespace presentacion
                     }
                     else
                     {
-                        Alert.ShowAlertError(vmensaje, this);
+                        Toast.Error(vmensaje, this);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
 

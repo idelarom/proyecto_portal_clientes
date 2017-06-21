@@ -19,6 +19,8 @@ namespace datos.Modelos
         [StringLength(8000)]
         public string descripcion { get; set; }
 
+        public byte? avance { get; set; }
+
         [StringLength(1000)]
         public string responsable { get; set; }
 

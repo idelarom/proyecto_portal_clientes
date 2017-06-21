@@ -1,7 +1,10 @@
-﻿using datos.Modelos;
+﻿using datos;
+using datos.Modelos;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Validation;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace negocio.Componentes
@@ -73,6 +76,7 @@ namespace negocio.Componentes
                         else { entidad_pend.id_pinvolucrado = null; }
                         entidad_pend.descripcion = row["descripcion"].ToString();
                         entidad_pend.responsable = row["responsable"].ToString();
+                        entidad_pend.avance = Convert.ToByte(row["avance"]);
                         entidad_pend.fecha_planeada = Convert.ToDateTime(row["fecha"]);
                         return_array[0] = ExistPendiente(entidad_pend) ? "" : AgregarPendiente(entidad_pend);
                         if (return_array[0] != "")
@@ -156,6 +160,7 @@ namespace negocio.Componentes
                     entidad_pend.descripcion = row["descripcion"].ToString();
                     entidad_pend.responsable = row["responsable"].ToString();
                     entidad_pend.fecha_planeada = Convert.ToDateTime(row["fecha"]);
+                    entidad_pend.avance = Convert.ToByte(row["avance"]);
                     vmensaje = ExistPendiente(entidad_pend) ? "" : AgregarPendiente(entidad_pend);
                     if (vmensaje != "")
                     {
@@ -380,6 +385,7 @@ namespace negocio.Componentes
                     fecha_planeada = entidad.fecha_planeada,
                     responsable = entidad.responsable,
                     fecha_registro = DateTime.Now,
+                    avance = entidad.avance,
                     usuario = entidad.usuario
                 };
                 Model context = new Model();
@@ -469,7 +475,8 @@ namespace negocio.Componentes
                                     u.fecha_edicion,
                                     u.usuario_borrado,
                                     u.fecha_borrado,
-                                    u.comentarios_borrado
+                                    u.comentarios_borrado,
+                                    u.avance
                                 })
                                 .OrderBy(u => u.responsable);
                 dt = To.DataTable(query.ToList());
@@ -488,6 +495,33 @@ namespace negocio.Componentes
             }
         }
 
+
+        public DataTable SP_PENDIENTES(int id_proyecto, int id_cliente)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                DataSet ds = new DataSet();
+                List<SqlParameter> listparameters = new List<SqlParameter>();
+                listparameters.Add(new SqlParameter() { ParameterName = "@pid_proyecto", SqlDbType = SqlDbType.Int, Value = id_proyecto });
+                listparameters.Add(new SqlParameter() { ParameterName = "@pid_cliente", SqlDbType = SqlDbType.Int, Value = id_cliente });
+                Datos data = new Datos();
+                try
+                {
+                    //ds = data.datos_Clientes(listparameters);
+                    ds = data.enviar("SP_PENDIENTES", listparameters, false, 1);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                return ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                return dt;
+            }
+        }
         /// <summary>
         /// Borra un participante
         /// </summary>
@@ -648,7 +682,26 @@ namespace negocio.Componentes
                 return false;
             }
         }
-
+        public string EditPendiente(proyectos_minutas_pendientes entidad)
+        {
+            try
+            {
+                Model context = new Model();
+                proyectos_minutas_pendientes participantes = context.proyectos_minutas_pendientes
+                                   .First(i => i.id_minpendiente == entidad.id_minpendiente);
+                participantes.descripcion = entidad.descripcion;
+                participantes.fecha_planeada = entidad.fecha_planeada;
+                participantes.avance = entidad.avance;
+                participantes.fecha_edicion = DateTime.Now;
+                participantes.usuario_edicion = entidad.usuario_edicion;
+                context.SaveChanges();
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
         public bool ExistPendiente(proyectos_minutas_pendientes entidad)
         {
             try
@@ -661,6 +714,7 @@ namespace negocio.Componentes
                            {
                                u.id_minpendiente,
                                u.id_minuta,
+                               u.avance,
                                u.id_pinvolucrado,
                                u.descripcion,
                                u.responsable,
@@ -681,6 +735,7 @@ namespace negocio.Componentes
                     int id_minpendiente = Convert.ToInt32(row[0]["id_minpendiente"]);
                     proyectos_minutas_pendientes participantes = context.proyectos_minutas_pendientes
                                     .First(i => i.id_minpendiente == id_minpendiente);
+                    participantes.avance = entidad.avance;
                     participantes.fecha_borrado = null;
                     participantes.usuario_borrado = null;
                     participantes.comentarios_borrado = null;

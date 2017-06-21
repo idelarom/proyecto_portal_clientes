@@ -50,7 +50,7 @@ namespace presentacion
             //CargarListadoEmpleados("");
             CargarGrafica(id_proyecto);
             CargarEntregables(id_proyecto);
-            CargarTareas(id_proyecto);
+            CargarTareas(id_proyecto,"");
             CargarDocumentos(id_proyecto);
             switch (tab.ToLower())
             {
@@ -91,9 +91,31 @@ namespace presentacion
                     tadmin.Attributes["class"] = "active";
                     tab_admin.Attributes["class"] = "tab-pane active";
                     break;
+                //tab pendientes
+                case "tpend":
+                    CargarPendientesPestaña(id_proyecto);
+                    tpend.Attributes["class"] = "active";
+                    tab_pend.Attributes["class"] = "tab-pane active";
+                    break;
             }
         }
-
+        private void CargarProyectos(string filtro)
+        {
+            try
+            {
+                ProyectosCOM proyectos = new ProyectosCOM();
+                DataSet ds = proyectos.sp_GetConnextProjectsForClients(filtro);
+                rdlproyectos.DataTextField = "nombre_buscar";
+                rdlproyectos.DataValueField = "folio";
+                rdlproyectos.DataSource = ds.Tables[0];
+                rdlproyectos.DataBind();
+            }
+            catch (Exception ex)
+            {
+                diverrorfolio.Visible = true;
+                lblerrorfolio.Text = ex.Message;
+            }
+        }
         private void CargarDiagramas()
         {
             ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
@@ -124,7 +146,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar los roles de proyecto. "+ ex.Message, this);
             }
         }
 
@@ -139,10 +161,12 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"").Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(id_proyecto, usuario, administrador, Convert.ToInt32(Session["id_cliente"]),"",true).Tables[0];
                 if (dt.Rows.Count > 0)
                 {
                     DataRow row = dt.Rows[0];
+                    ViewState["terminado"] = Convert.ToBoolean(row["terminado"]);
+                    ViewState["folio_pmt"] = row["folio_pmt"].ToString().Trim();
                     ViewState["correo_bienvenida"] = Convert.ToBoolean(row["correo_bienvenida"]);
                     ViewState["es_creador"] = Convert.ToString(Session["usuario"]).ToUpper().Trim() == row["usuario"].ToString().Trim().ToUpper();
                     lblproyect.Text = row["proyecto"].ToString();
@@ -194,7 +218,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar proyecto. " +ex.Message, this);
             }
         }
 
@@ -209,7 +233,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Error al cargar empleados del proyecto. " + ex.ToString(), this);
+                Toast.Error("Error al cargar empleados del proyecto. " + ex.Message, this);
             }
         }
 
@@ -230,7 +254,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar los correos del cliente. "+ex.Message, this);
             }
         }
 
@@ -255,7 +279,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar mailstones. "+ex.Message, this);
             }
         }
 
@@ -275,18 +299,22 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar documentos. "+ex.Message, this);
             }
         }
 
-        private void CargarTareas(int id_proyecto)
+        private void CargarTareas(int id_proyecto, string filtro)
         {
             try
             {
                 TareasCOM tareas = new TareasCOM();
-                grid_tareas.DataSource = tareas.GetAll(id_proyecto);
-                grid_tareas.DataBind();
                 DataTable dt = tareas.GetAll(id_proyecto);
+                if (filtro != "")
+                {
+                    DataTable dt_filtro = dt.Select("tarea like '%"+filtro+"%'").CopyToDataTable();
+                    dt = dt_filtro;
+                }
+
                 List<SiteDataItem> siteData = new List<SiteDataItem>();
                 foreach (DataRow row in dt.Rows)
                 {
@@ -296,16 +324,23 @@ namespace presentacion
                         row["tarea"].ToString() + " | " + row["avance"].ToString() + " %"
                         ));
                 }
+
                 rtrvProyectWorks.DataTextField = "Text";
                 rtrvProyectWorks.DataValueField = "ID";
                 rtrvProyectWorks.DataFieldID = "ID";
                 rtrvProyectWorks.DataFieldParentID = "ParentID";
                 rtrvProyectWorks.DataSource = siteData;
                 rtrvProyectWorks.DataBind();
+                grid_tareas.DataSource = dt;
+                grid_tareas.DataBind();
+                if (dt.Rows.Count == 0)
+                {
+                    Toast.Info("No se encontro ninguna coincidencia. Intentelo nuevamente.", "Mensaje del Sistema", this);
+                }
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar tareas. "+ex.Message, this);
             }
         }
 
@@ -323,10 +358,26 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar correos. "+ex.Message, this);
             }
         }
-
+        private void CargarPendientesPestaña(int id_proyecto)
+        {
+            try
+            {
+                MinutasCOM minutas = new MinutasCOM();
+                DataTable dt = minutas.SP_PENDIENTES(id_proyecto, Convert.ToInt32(Session["id_cliente"]));
+                if (dt.Rows.Count > 0)
+                {
+                    repeat_pendientes.DataSource = dt;
+                    repeat_pendientes.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                Toast.Error("Error al cargar pestaña de pendientes. "+ex.Message, this);
+            }
+        }
         private void CargarInvolucrado(int id_proyecto)
         {
             try
@@ -347,7 +398,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar involucrados. "+ex.Message, this);
             }
         }
 
@@ -456,7 +507,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -476,7 +527,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -523,7 +574,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -589,7 +640,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -693,7 +744,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errormodal2.Visible = true;
-                lblerrormodal2.Text = ex.ToString();
+                lblerrormodal2.Text = ex.Message;
                 ModalShow("#myModalExcel");
             }
         }
@@ -727,7 +778,7 @@ namespace presentacion
                 {
                     vmensaje = "Ingrese un Avance del Proyecto";
                 }
-                else if (Convert.ToInt32(rtxtavance.Text) > 100)
+                else if (Convert.ToInt32(rtxtxavancetarea.Text) > 100)
                 {
                     rtxtxavancetarea.Text = "100";
                     vmensaje = "Ingrese un Avance del Proyecto menor a 100";
@@ -755,7 +806,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -793,7 +844,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -964,7 +1015,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -995,7 +1046,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -1028,7 +1079,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -1053,7 +1104,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -1083,7 +1134,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al cargar minutas. "+ex.Message, this);
             }
         }
 
@@ -1154,11 +1205,11 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
-        private String AddTablePendientes(string responsable, string descripcion, DateTime fecha, int id_pinvolucrado)
+        private String AddTablePendientes(string responsable, string descripcion, DateTime fecha, int id_pinvolucrado, int avance)
         {
             try
             {
@@ -1168,6 +1219,7 @@ namespace presentacion
                     ndt.Columns.Add("responsable");
                     ndt.Columns.Add("descripcion");
                     ndt.Columns.Add("fecha");
+                    ndt.Columns.Add("avance");
                     ndt.Columns.Add("id_pinvolucrado");
                     ViewState["dt_pendientes"] = ndt;
                 }
@@ -1177,6 +1229,7 @@ namespace presentacion
                 row["responsable"] = responsable;
                 row["descripcion"] = descripcion;
                 row["fecha"] = fecha;
+                row["avance"] = avance;
                 row["id_pinvolucrado"] = id_pinvolucrado;
                 dt.Rows.Add(row);
                 ViewState["dt_pendientes"] = dt;
@@ -1185,7 +1238,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -1260,14 +1313,14 @@ namespace presentacion
                 }
                 else {
 
-                    Alert.ShowAlertError("No se encontro ninguna coincidencia. Intentelo nuevamente.", this);
+                    Toast.Info("No se encontro ninguna coincidencia. Intentelo nuevamente.","Mensaje del Sistema", this);
                 }                
                
                 
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Error al cargar lista de empleados. ", this);
+                Toast.Error("Error al cargar lista de empleados. "+ex.Message, this);
             }
         }
 
@@ -1298,13 +1351,13 @@ namespace presentacion
                     }
                     else
                     {
-                        Alert.ShowAlertError("Este Cliente no Tiene contactos relacionados. Comuniquese con su administrador.", this);
+                        Toast.Error("Este Cliente no Tiene contactos relacionados. Comuniquese con su administrador.", this);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Erro al cargar lista de clientes: " + ex.ToString(), this);
+                Toast.Error("Error al cargar lista de clientes: " + ex.Message, this);
             }
         }
 
@@ -1335,7 +1388,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Erro al cargar lista de clientes: " + ex.ToString(), this);
+                Toast.Error("Error al cargar lista de clientes: " + ex.Message, this);
             }
         }
 
@@ -1354,7 +1407,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError("Erro al cargar lista de tipos de usuarios: " + ex.ToString(), this);
+                Toast.Error("Error al cargar lista de tipos de usuarios: " + ex.Message, this);
             }
         }
 
@@ -1459,7 +1512,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al generar grafica. "+ex.Message, this);
             }
             
         }
@@ -1475,10 +1528,11 @@ namespace presentacion
             {
                 if (!IsPostBack)
                 {
-
+                    CargarConfiguracionWidgets();
                     proyecto_general.pid_proyecto = id_proyecto;
                     ViewState["dt_participantes"] = null;
                     ViewState["dt_empleados"] = null;
+                    ViewState["terminado"] = null;
                     ViewState["dt_comidas"] = null;
                     ViewState["es_creador"] = null;
                     ViewState["correo_bienvenida"] = null;
@@ -1486,6 +1540,7 @@ namespace presentacion
                     ViewState["dt_pendientes"] = null;
                     ViewState["pendiente_responsable"] = null;
                     ViewState["pendiente_descripcion"] = null;
+                    ViewState["folio_pmt"] = null;
                     CargarProyectos(id_proyecto, usuario, Convert.ToBoolean(Session["administrador"]));
                     funciones.ActualizaAvances();
                  
@@ -1498,8 +1553,6 @@ namespace presentacion
                     lnkaddparticipante.Visible = !cliente;
                     lnkguardarminuta.Visible = !cliente;
                     lnknuevaminuta.Visible = !cliente;
-                    cbxpublico.Checked = false;
-                    cbxpublico.Enabled = !cliente;
                     lnkguardartarea_modal.Visible = !cliente;
                     lnkeliminartarea_modal.Visible = !cliente;
                     lnkGuardarEntregable.Visible = !cliente;
@@ -1510,25 +1563,52 @@ namespace presentacion
                     lnknuevo_entregable.Visible = !cliente;
                     lnkagregarempleado.Visible = !cliente;
                     tadmin.Visible = !cliente;
-
+                    lnkfolio.Visible = !cliente;
+                    cbxpublico.Checked = false;
+                    cbxpublico.Enabled = !cliente;
                     bool es_creador = Convert.ToBoolean(ViewState["es_creador"]);
                     bool administrador = Convert.ToBoolean(Session["administrador"]);
                     lnkterminacíon.Visible = ((es_creador || administrador) && !cliente);
-                  
+                    if (Convert.ToBoolean(ViewState["terminado"]))
+                    {
+                        lnkguardarcliente.Visible = false;
+                        //lnkeliminarinvolucrado.Visible = !cliente;
+                        //lnkguardarinvolucrado.Visible = !cliente;
+                        lnkguardarcharter.Visible = false;
+                        lnkaddpendientes.Visible = false;
+                        lnkaddparticipante.Visible = false;
+                        lnkguardarminuta.Visible = false;
+                        lnknuevaminuta.Visible = false;
+                        lnkguardartarea_modal.Visible = false;
+                        lnkeliminartarea_modal.Visible = false;
+                        lnkGuardarEntregable.Visible = false;
+                        lnkeliminarentregable.Visible = false;
+                        lnksubirexcel.Visible = false;
+                        lnkeditar_cambios.Visible = false;
+                        lnkactualiza_excel.Visible = false;
+                        lnknuevo_entregable.Visible = false;
+                        lnkagregarempleado.Visible = false;
+                        lnkfolio.Visible = false;
+                        lnkguardapendiente.Visible = false;
+                    }
                 }
             }
         }
 
-        private void CargarGraficaMailstones()
+        private void CargarConfiguracionWidgets()
         {
             try
             {
 
+                //configuramos las vistas
+                lnkvistamapa.CssClass = Convert.ToBoolean(Session["vista_arbol_mapa_tareas"]) ? "btn btn-primary btn-flat" : "btn btn-default btn-flat";
+                lnkvistatabla.CssClass = !Convert.ToBoolean(Session["vista_arbol_mapa_tareas"]) ? "btn btn-primary btn-flat" : "btn btn-default btn-flat";
+                div_tareas_arbol.Visible = lnkvistamapa.CssClass == "btn btn-primary btn-flat";
+                div_tareas_tabla.Visible = lnkvistatabla.CssClass == "btn btn-primary btn-flat";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                Toast.Error("Error al cargar la configuracion de los widgets. "+ex.Message,this);
             }
         }
         protected void lnkeditar_cambios_Click(object sender, EventArgs e)
@@ -1656,7 +1736,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errormodal2.Visible = true;
-                lblerrormodal2.Text = ex.ToString();
+                lblerrormodal2.Text = ex.Message;
                 ModalShow("#myModalExcel");
             }
             finally
@@ -1708,7 +1788,50 @@ namespace presentacion
                 lblerrorentregable.Text = vmensaje;
             }
         }
+        protected void lnkselectedtarea_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (hdfid_tarea.Value == "")
+                {
 
+                    Toast.Error("No se pudo procesar la solicitud. Intentelo nuevamente o refresque la pagina.", this);
+                }
+                else {
+                    int id = Convert.ToInt32(hdfid_tarea.Value);
+                    TareasCOM tareas = new TareasCOM();
+                    DataTable dt = tareas.GetAll(Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"])));
+                    DataRow[] row = null;
+                    if (dt.Rows.Count > 0)
+                    {
+                        row = dt.Select("id_tarea = " + id.ToString() + "");
+                    }
+                    if (row.Length > 0)
+                    {
+                        Boolean cliente = Convert.ToBoolean(Session["cliente"]);
+                        div_error_tareas.Visible = false;
+                        lblerror_tareas.Text = "";
+                        lnkeliminartarea_modal.Visible = !cliente;
+                        rtxttarea.Text = row[0]["tarea"].ToString();
+                        rtxtxavancetarea.Text = row[0]["avance"].ToString();
+                        if (row[0]["fecha_inicio"] != DBNull.Value)
+                        {
+                            rdfechainiciotarea.SelectedDate = Convert.ToDateTime(row[0]["fecha_inicio"]);
+                            rdfechafintarea.SelectedDate = Convert.ToDateTime(row[0]["fecha_fin"]);
+                            rtxtrecursos.Text = row[0]["recursos"].ToString().Trim();
+                            txtcodigo_tarea.Text = row[0]["codigo_tarea"].ToString().Trim();
+                            rtxtduracion.Text = row[0]["duración"].ToString().Trim();
+                        }
+                    }
+                    txtid_tarea.Text = id.ToString();
+                    ModalShow("#myModalTareas");
+                }
+            }
+            catch (Exception ex)
+            {
+                Toast.Error(ex.Message,this);
+            }
+        }
         protected void rtrvProyectWorks_NodeClick(object sender, RadTreeNodeEventArgs e)
         {
             int id = Convert.ToInt32(e.Node.Value);
@@ -2020,7 +2143,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_error_correos.Visible = true;
-                lblerrorcorreos.Text = ex.ToString();
+                lblerrorcorreos.Text = ex.Message;
                 ModalShow("#myModalCorreos");
             }
             finally
@@ -2087,7 +2210,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error(ex.Message, this);
             }
         }
 
@@ -2149,7 +2272,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errorminuta.Visible = true;
-                lblerrorminuta.Text = ex.ToString();
+                lblerrorminuta.Text = ex.Message;
                 ModalShow("#myModalMinutas");
             }
             finally
@@ -2204,7 +2327,7 @@ namespace presentacion
                         if (dt_pendientes.Rows.Count > 0)
                         {
                             DataView view = new System.Data.DataView(dt_pendientes);
-                            DataTable selected = view.ToTable("Selected", false, "responsable", "descripcion", "fecha_planeada", "id_pinvolucrado");
+                            DataTable selected = view.ToTable("Selected", false, "responsable", "descripcion", "fecha_planeada", "id_pinvolucrado","avance");
                             selected.Columns["fecha_planeada"].ColumnName = "fecha";
                             ViewState["dt_pendientes"] = selected;
                             CargarPendientes();
@@ -2287,7 +2410,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errorminuta.Visible = true;
-                lblerrorminuta.Text = ex.ToString();
+                lblerrorminuta.Text = ex.Message;
                 ModalShow("#myModalMinutas");
             }
             finally
@@ -2352,7 +2475,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_participantes.Visible = true;
-                lblparticipantes.Text = ex.ToString();
+                lblparticipantes.Text = ex.Message;
                 ModalShow("#myModalMinutas");
             }
         }
@@ -2369,7 +2492,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_participantes.Visible = true;
-                lblparticipantes.Text = ex.ToString();
+                lblparticipantes.Text = ex.Message;
                 ModalShow("#myModalMinutas");
             }
         }
@@ -2387,7 +2510,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_pendientes.Visible = true;
-                lblerrorpendientes.Text = ex.ToString();
+                lblerrorpendientes.Text = ex.Message;
                 ModalShow("#myModalPendientes");
             }
         }
@@ -2424,7 +2547,7 @@ namespace presentacion
             if (dt_pendientes.Rows.Count > 0)
             {
                 DataView view = new System.Data.DataView(dt_pendientes);
-                DataTable selected = view.ToTable("Selected", false, "responsable", "descripcion", "fecha_planeada", "id_pinvolucrado");
+                DataTable selected = view.ToTable("Selected", false, "responsable", "descripcion", "fecha_planeada", "id_pinvolucrado","avance");
                 selected.Columns["fecha_planeada"].ColumnName = "fecha";
                 ViewState["dt_pendientes"] = selected;
                 CargarPendientes();
@@ -2533,7 +2656,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 diverror_invo.Visible = true;
-                lblerrorinvo.Text = ex.ToString();
+                lblerrorinvo.Text = ex.Message;
                 ModalShow("#myModalInvolucrados");
             }
         }
@@ -2566,7 +2689,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 diverror_invo.Visible = true;
-                lblerrorinvo.Text = ex.ToString();
+                lblerrorinvo.Text = ex.Message;
                 ModalShow("#myModalInvolucrados");
             }
         }
@@ -2597,7 +2720,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 diverror_invo.Visible = true;
-                lblerrorinvo.Text = ex.ToString();
+                lblerrorinvo.Text = ex.Message;
                 ModalShow("#myModalInvolucrados");
             }
         }
@@ -2649,7 +2772,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_error_charter.Visible = true;
-                lblerrorcharter.Text = ex.ToString();
+                lblerrorcharter.Text = ex.Message;
                 ModalShow("#myModalCharter");
             }
         }
@@ -2678,6 +2801,7 @@ namespace presentacion
                 }
                 else
                 {
+                    txtavancependientes.Text = txtavancependientes.Text== "" ? "0" : txtavancependientes.Text; 
                     if (ViewState["pendiente_responsable"] != null && ViewState["pendiente_descripcion"] != null)
                     {
                         string nombre = ViewState["pendiente_responsable"] as string;
@@ -2695,19 +2819,22 @@ namespace presentacion
                             DataTable dt = involucrados.Get(entidad);
                             if (dt.Rows.Count > 0)
                             {
-                                AddTablePendientes(dt.Rows[0]["nombre"].ToString(), rtxtpendiente.Text, Convert.ToDateTime(rdtfecha_planeada.SelectedDate), Convert.ToInt32(item.Value));
+                                AddTablePendientes(dt.Rows[0]["nombre"].ToString(), rtxtpendiente.Text, 
+                                    Convert.ToDateTime(rdtfecha_planeada.SelectedDate), Convert.ToInt32(item.Value), Convert.ToInt32(txtavancependientes.Text));
                             }
                         }
                     }
                     else
                     {
-                        AddTablePendientes(rtxtresponsable.Text, rtxtpendiente.Text, Convert.ToDateTime(rdtfecha_planeada.SelectedDate), 0);
+                        AddTablePendientes(rtxtresponsable.Text, rtxtpendiente.Text, 
+                            Convert.ToDateTime(rdtfecha_planeada.SelectedDate), 0, Convert.ToInt32(txtavancependientes.Text));
                     }
                     rtxtpendiente.Text = "";
+                    txtavancependientes.Text = "0";
                     rdtfecha_planeada.SelectedDate = null;
                     rtxtorganizacion.Text = "";
                     rtxtresponsable.Text = "";
-                    rdlinvopendientes.SelectedItems.Clear();
+                    rdlinvopendientes.ClearSelection();
                     ViewState["pendiente_responsable"] = null;
                     ViewState["pendiente_descripcion"] = null;
                 }
@@ -2715,7 +2842,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_pendientes.Visible = true;
-                lblerrorpendientes.Text = ex.ToString();
+                lblerrorpendientes.Text = ex.Message;
                 ModalShow("#myModalPendientes");
             }
         }
@@ -2766,7 +2893,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Alert.ShowAlertError(ex.Message, this);
             }
         }
 
@@ -2794,7 +2921,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Alert.ShowAlertError(ex.Message, this);
             }
         }
 
@@ -2978,7 +3105,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errorclientes.Visible = true;
-                lblerrorclientes.Text = ex.ToString();
+                lblerrorclientes.Text = ex.Message;
                 ModalShow("#myModalClientes");
             }
         }
@@ -3068,7 +3195,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errorempleados.Visible = true;
-                lblerrorempleados.Text = ex.ToString();
+                lblerrorempleados.Text = ex.Message;
             }
         }
 
@@ -3097,12 +3224,12 @@ namespace presentacion
                 }
                 else
                 {
-                    Alert.ShowAlertError(vmensaje, this);
+                    Toast.Error(vmensaje, this);
                 }
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Toast.Error("Error al eliminar empleado. "+ex.Message, this);
             }
         }
 
@@ -3248,7 +3375,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                lblerrorterminacion.Text = ex.ToString();
+                lblerrorterminacion.Text = ex.Message;
                 div_errorterminacion.Visible = true;
                 ModalShow("#myModalTerminacion");
             }
@@ -3290,6 +3417,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
+                Toast.Error("Error al validar la documentación de cierre. "+ex.Message,this);
             }
         }
 
@@ -3312,7 +3440,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -3385,7 +3513,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errorterminacion.Visible = true;
-                lblerrorterminacion.Text = ex.ToString();
+                lblerrorterminacion.Text = ex.Message;
             }
         }
 
@@ -3430,6 +3558,7 @@ namespace presentacion
                     DataTable dt_filter = dt.Select("descripcion = '"+pendiente.Trim()+ "' and responsable = '"+nombre+"'").CopyToDataTable();
                     if (dt_filter.Rows.Count > 0)
                     {
+                        txtavancependientes.Text = dt_filter.Rows[0]["avance"].ToString();
                         rtxtresponsable.Text = dt_filter.Rows[0]["responsable"].ToString();
                         rtxtpendiente.Text = dt_filter.Rows[0]["descripcion"].ToString();
                         rdtfecha_planeada.SelectedDate = Convert.ToDateTime(dt_filter.Rows[0]["fecha"]);
@@ -3447,14 +3576,14 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_pendientes.Visible = true;
-                lblerrorpendientes.Text = ex.ToString();
+                lblerrorpendientes.Text = ex.Message;
                 ModalShow("#myModalPendientes");
             }
         }
 
         protected void btnbuscarempleado_Click(object sender, EventArgs e)
         {
-            if (txtbuscarempleadoproyecto.Text.Trim().Length > 2)
+            if (txtbuscarempleadoproyecto.Text.Trim().Length > 2 || txtbuscarempleadoproyecto.Text.Trim().Length == 0)
             {
                 CargarListadoEmpleados(txtbuscarempleadoproyecto.Text.Trim());
                 imgloadempleados.Style["display"] = "none";
@@ -3462,28 +3591,28 @@ namespace presentacion
             }
             else
             {
-                Alert.ShowAlertInfo("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema", this);
+                Toast.Info("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema", this);
             }
 
         }
 
         protected void btnbuscarempleado2_Click(object sender, EventArgs e)
         {
-            if (txtbuscarempleado.Text.Trim().Length > 2)
+            if (txtbuscarempleado.Text.Trim().Length > 2 || txtbuscarempleado.Text.Trim().Length == 0)
             {
                 CargarListadoEmpleados(txtbuscarempleado.Text.Trim());
                 imgloadempleados.Style["display"] = "none";
                 lblbe2.Style["display"] = "none";
             }
             else {
-                Alert.ShowAlertInfo("Ingrese un minimo de 3 caracteres para realizar la busqueda.","Mensaje del Sistema",this);
+                Toast.Info("Ingrese un minimo de 3 caracteres para realizar la busqueda.","Mensaje del Sistema",this);
             }
 
         }
 
         protected void lnkbuscarcliente_Click(object sender, EventArgs e)
         {
-            if (txtbuscarclientes.Text.Trim().Length > 2)
+            if (txtbuscarclientes.Text.Trim().Length > 2 || txtbuscarclientes.Text.Trim().Length == 0)
             {
                 CargarListaClientes(txtbuscarclientes.Text.Trim());
                 imgloadcliente.Style["display"] = "none";
@@ -3491,7 +3620,237 @@ namespace presentacion
             }
             else
             {
-                Alert.ShowAlertInfo("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema", this);
+                Toast.Info("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema", this);
+            }
+        }
+
+        protected void lnkeditarpendientes_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                txtid_minpendiente.Text = "";
+                txtavancetab.Text = "0";
+                rtxtpendiente_tab.Text = "";
+                rdpfecha_planeada_tab.SelectedDate = null;
+                LinkButton lnk = sender as LinkButton;
+                MinutasCOM minutas = new MinutasCOM();
+                DataTable dt = minutas.SP_PENDIENTES(Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"])), Convert.ToInt32(Session["id_cliente"]));
+                DataTable dt_Select = dt.Select("id_minpendiente = " + lnk.CommandArgument.ToString().Trim() + "").CopyToDataTable();
+                if (dt_Select.Rows.Count > 0)
+                {
+                    rtxtpendiente_tab.Text= dt_Select.Rows[0]["descripcion"].ToString();
+                    txtid_minpendiente.Text = lnk.CommandArgument.ToString().Trim();
+                    txtavancetab.Text = dt_Select.Rows[0]["avance"].ToString();
+                    rdpfecha_planeada_tab.SelectedDate = Convert.ToDateTime(dt_Select.Rows[0]["fecha_planeada"].ToString());
+                    ModalShow("#myModalPendientesTab");
+                }
+                else {
+                    Toast.Error("Error al cargar pendiente. " , this);
+                }
+            }
+            catch (Exception ex)
+            {
+                rtxtpendiente_tab.Text = "";
+                txtid_minpendiente.Text = "";
+                txtavancetab.Text = "0";
+                rdpfecha_planeada_tab.SelectedDate = null;
+                Toast.Error("Error al cargar pendiente. "+ex.Message,this);
+            }
+        }
+
+        protected void lnkguardapendiente_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int avance = txtavancetab.Text == "" ? 0 : Convert.ToInt32(txtavancetab.Text);
+                diverrormodalpendientestab.Visible = false;
+                if (txtid_minpendiente.Text == "")
+                {
+                    diverrormodalpendientestab.Visible = true;
+                    lblerrorpendtab.Text = "No se puede procesar la solicitud. Seleccione de nuevo el pendiente a editar.";
+                }
+                else if (avance < 0 || avance > 100)
+                {
+                    diverrormodalpendientestab.Visible = true;
+                    lblerrorpendtab.Text = "El avance debe estar en 0 y 100";
+                }
+                else if (rtxtpendiente_tab.Text == "")
+                {
+                    diverrormodalpendientestab.Visible = true;
+                    lblerrorpendtab.Text = "No puede dejar el campo 'pendiente' vacio.";
+                }
+                else
+                {
+                    proyectos_minutas_pendientes entidad = new proyectos_minutas_pendientes();
+                    MinutasCOM minutas = new MinutasCOM();
+                    entidad.id_minpendiente = Convert.ToInt32(txtid_minpendiente.Text.Trim());
+                    entidad.avance = Convert.ToByte(avance);
+                    entidad.descripcion = rtxtpendiente_tab.Text;
+                    entidad.fecha_planeada = Convert.ToDateTime(rdpfecha_planeada_tab.SelectedDate);
+                    entidad.usuario_edicion = Session["usuario"] as string;
+                    string vmensaje = minutas.EditPendiente(entidad);
+                    if (vmensaje != "")
+                    {
+                        diverrormodalpendientestab.Visible = true;
+                        lblerrorpendtab.Text =vmensaje;
+                    }
+                    else {
+                        string url = "proyecto_general.aspx?tab=tpend&id_proyecto=" + Request.QueryString["id_proyecto"];
+                        ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
+                            "AlertGO('Pendiente Guardado Correctamente', '" + url + "');", true);
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                diverrormodalpendientestab.Visible = true;
+                lblerrorpendtab.Text = ex.Message;
+            }
+        }
+    
+
+        protected void lnkbuscarfolio_Click(object sender, EventArgs e)
+        {
+            if (txtbuscarfolio.Text.Trim().Length > 2 || txtbuscarfolio.Text.Trim().Length == 0)
+            {
+                CargarProyectos(txtbuscarfolio.Text.Trim());
+                imgfolio.Style["display"] = "none";
+                lblfolio.Style["display"] = "none";
+            }
+            else
+            {
+                Toast.Info("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema", this);
+            }
+        }
+
+        protected void lnkfolio_Click(object sender, EventArgs e)
+        {
+            string folio = ViewState["folio_pmt"] as string;
+            if (folio != "")
+            {
+                CargarProyectos(folio);
+                RadListBoxItem item = rdlproyectos.FindItemByValue(folio);
+                if (item != null)
+                {
+                    item.Selected = true;
+                }
+            }
+            ModalShow("#myModalFolio");
+        }
+
+        protected void lnkguardarfolio_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                diverrorfolio.Visible = false;
+                IList<RadListBoxItem> collection = rdlproyectos.SelectedItems;
+                if (collection.Count > 0)
+                {
+                    proyectos entidad = new proyectos();
+                    ProyectosCOM proyectos = new ProyectosCOM();
+                    entidad.id_proyecto = Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"]));
+                    entidad.usuario_edicion = Session["usuario"] as string;
+                    entidad.folio_pmt = rdlproyectos.SelectedValue;
+                    string vmensaje = proyectos.RelacionarFolio(entidad);
+                    if (vmensaje == "")
+                    {
+                        string url = "proyecto_general.aspx?tab=tinfo&id_proyecto=" + Request.QueryString["id_proyecto"];
+                        ScriptManager.RegisterStartupScript(this, GetType(), Guid.NewGuid().ToString(),
+                            "AlertGO('Información Guardada Correctamente', '" + url + "');", true);
+                    }
+                    else {
+
+                        diverrorfolio.Visible = true;
+                        lblerrorfolio.Text = vmensaje;
+                    }
+                }
+                else {
+
+                    diverrorfolio.Visible = true;
+                    lblerrorfolio.Text = "Seleccione un proyecto";
+                }
+            }
+            catch (Exception ex)
+            {
+                diverrorfolio.Visible = true;
+                lblerrorfolio.Text = ex.Message;
+            }
+        }
+
+        protected void lnkvistamapa_Click(object sender, EventArgs e)
+        {
+            lnkvistamapa.CssClass = lnkvistamapa.CssClass == "btn btn-primary btn-flat" ? "btn btn-default btn-flat" : "btn btn-primary btn-flat";
+            lnkvistatabla.CssClass = lnkvistatabla.CssClass == "btn btn-primary btn-flat" ? "btn btn-default btn-flat" : "btn btn-primary btn-flat";
+            div_tareas_arbol.Visible = lnkvistamapa.CssClass == "btn btn-primary btn-flat";
+            div_tareas_tabla.Visible = lnkvistatabla.CssClass == "btn btn-primary btn-flat";
+
+            try
+            {
+                bool vista_arbol_mapa_tareas = div_tareas_arbol.Visible;
+                usuarios entidad = new usuarios();
+                entidad.vista_arbol_mapa_tareas = vista_arbol_mapa_tareas;
+                entidad.usuario_edicion = Session["usuario"] as string;
+                entidad.id_usuario = Convert.ToInt32(Session["id_usuario"]);
+                UsuariosCOM usuarios = new UsuariosCOM();
+                string vmensaje = usuarios.EditarVistasMapaTareas(entidad);
+                if (vmensaje == "")
+                {
+                    Session["vista_arbol_mapa_tareas"] = vista_arbol_mapa_tareas;
+                }
+                else
+                {
+                    Toast.Error(vmensaje, this);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Toast.Error("Error al guardar configuracion de widgets. " + ex.Message, this);
+            }
+        }
+
+        protected void lnkbuscartareafiltro_Click(object sender, EventArgs e)
+        {
+            if (txtbuscartarea.Text.Length > 2 || txtbuscartarea.Text.Length == 0)
+            {
+
+                CargarTareas(Convert.ToInt32(funciones.de64aTexto(Request.QueryString["id_proyecto"])), txtbuscartarea.Text.Trim());
+            }
+            else {
+                Toast.Info("Ingrese un minimo de 3 caracteres para realizar la busqueda.", "Mensaje del Sistema",this);
+            }
+        }
+
+        protected void lnkvistagraficas_Click(object sender, EventArgs e)
+        {
+            lnkvistagraficas.CssClass = lnkvistagraficas.CssClass == "btn btn-primary btn-flat" ? "btn btn-default btn-flat" : "btn btn-primary btn-flat";
+            lnkmailsvistatabla.CssClass = lnkmailsvistatabla.CssClass == "btn btn-primary btn-flat" ? "btn btn-default btn-flat" : "btn btn-primary btn-flat";
+            div_chartentregables.Visible = lnkvistagraficas.CssClass == "btn btn-primary btn-flat";
+            div_mailstablas.Visible = lnkmailsvistatabla.CssClass == "btn btn-primary btn-flat";
+
+            try
+            {
+                bool vista_grafica_milestones = div_chartentregables.Visible;
+                usuarios entidad = new usuarios();
+                entidad.vista_grafica_milestones = vista_grafica_milestones;
+                entidad.usuario_edicion = Session["usuario"] as string;
+                entidad.id_usuario = Convert.ToInt32(Session["id_usuario"]);
+                UsuariosCOM usuarios = new UsuariosCOM();
+                string vmensaje = usuarios.EditarVistasMilestones(entidad);
+                if (vmensaje == "")
+                {
+                    Session["vista_grafica_milestones"] = vista_grafica_milestones;
+                }
+                else
+                {
+                    Toast.Error(vmensaje, this);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Toast.Error("Error al guardar configuracion de widgets. " + ex.Message, this);
             }
         }
     }

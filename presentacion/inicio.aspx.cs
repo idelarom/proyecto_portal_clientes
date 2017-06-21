@@ -139,7 +139,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errormodal2.Visible = true;
-                lblerrormodal2.Text = ex.ToString();
+                lblerrormodal2.Text = ex.Message;
                 ModalShow("#myModalExcel");
             }
             finally
@@ -175,7 +175,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Alert.ShowAlertError(ex.Message, this);
             }
         }
 
@@ -268,7 +268,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errormodal2.Visible = true;
-                lblerrormodal2.Text = ex.ToString();
+                lblerrormodal2.Text = ex.Message;
                 ModalShow("#myModalExcel");
             }
         }
@@ -283,7 +283,7 @@ namespace presentacion
             try
             {
                 ProyectosCOM proyectos = new ProyectosCOM();
-                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"]), usuario_filtro).Tables[0];
+                DataTable dt = proyectos.sp_get_proyects_info(0, usuario, administrador, Convert.ToInt32(Session["id_cliente"]), usuario_filtro,false).Tables[0];
                 th_pm.Visible = (administrador && Convert.ToInt32(Session["id_cliente"]) == 0);
                 div_combo_pm_x_proyecto.Visible = (administrador && Convert.ToInt32(Session["id_cliente"]) == 0);
                 if (dt.Rows.Count > 0)
@@ -308,7 +308,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                Alert.ShowAlertError(ex.ToString(), this);
+                Alert.ShowAlertError(ex.Message, this);
             }
         }
 
@@ -336,7 +336,7 @@ namespace presentacion
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return ex.Message;
             }
         }
 
@@ -468,7 +468,7 @@ namespace presentacion
             catch (Exception ex)
             {
                 div_errormodal2.Visible = true;
-                lblerrormodal2.Text = ex.ToString();
+                lblerrormodal2.Text = ex.Message;
                 ModalShow("#myModalExcel");
             }
         }
@@ -502,5 +502,7 @@ namespace presentacion
             }
             CargarProyectos(usuario, Convert.ToBoolean(Session["administrador"]), usuario_filtro);
         }
+
+     
     }
 }

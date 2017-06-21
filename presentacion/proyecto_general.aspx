@@ -53,6 +53,41 @@
             $("#ContentPlaceHolder1_txtbody").wysihtml5();
 
         }
+        function InitTable(table)
+        {
+            $(table).DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": false,
+                "info": true,
+                "autoWidth": true,
+                "language": {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+            });
+        }
         function Init() {
 
             $('.dvv').DataTable({
@@ -106,6 +141,20 @@
             $("#<%= imgloadcliente.ClientID%>").show();
             $("#<%= lblloadcliente.ClientID%>").show();
             return true;
+            }
+
+        function ChangedTextLoad4()
+        {            
+            $("#<%= imgfolio.ClientID%>").show();
+            $("#<%=lblfolio.ClientID%>").show();
+            return true;
+        }
+
+      function ChangedTextLoad5()
+        {            
+            $("#<%= imgbtarea.ClientID%>").show();
+            $("#<%=lblbtarea.ClientID%>").show();
+            return true;
         }
         function OpenModalEntregableForGraph(id_entregable) {
             // alert('ID ' + id_entregable);
@@ -156,7 +205,15 @@
                 return false;
             }
         }
-
+        function ConfirmPendienteModal(msg) {
+            if (confirm(msg)) {
+                $("#<%= lnkcargaguardapendiente.ClientID%>").show();
+                $("#<%= lnkguardapendiente.ClientID%>").hide();
+                return true;
+            } else {
+                return false;
+            }
+        }
         function ConfirmCharterModal(msg) {
             if (confirm(msg)) {
                 $("#<%= lnkcargandocharter.ClientID%>").show();
@@ -220,6 +277,16 @@
             if (confirm(msg)) {
                 $("#<%= lnkcargandotermina.ClientID%>").show();
                 $("#<%= lnkterminaproyecto.ClientID%>").hide();
+                return true;
+            } else {
+                return false;
+            }
+         }
+
+          function ConfirmRelacionFolio(msg) {
+            if (confirm(msg)) {
+                $("#<%= lnkcargandoguardarfolio.ClientID%>").show();
+                $("#<%= lnkguardarfolio.ClientID%>").hide();
                 return true;
             } else {
                 return false;
@@ -547,6 +614,15 @@
             }
 
         }
+
+        function CargarTarea(id_tarea)
+        {
+            var myHidden = document.getElementById('<%= hdfid_tarea.ClientID %>');
+                     
+            myHidden.value = id_tarea;
+            document.getElementById('<%= lnkselectedtarea.ClientID%>').click();
+            return false;
+        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -567,6 +643,9 @@
                     </li>
                     <li class="" id="tmin" runat="server">
                         <asp:LinkButton ID="LinkButton7" CommandName="tmin" runat="server" OnClick="tinfo_Click"><strong>Minutas</strong></asp:LinkButton>
+                    </li>
+                    <li class="" id="tpend" runat="server">
+                        <asp:LinkButton ID="LinkButton11" CommandName="tpend" runat="server" OnClick="tinfo_Click"><strong>Pendientes</strong></asp:LinkButton>
                     </li>
                     <li class="" id="tdoc" runat="server">
                         <asp:LinkButton ID="LinkButton8" CommandName="tdoc" runat="server" OnClick="tinfo_Click"><strong>Documentos</strong></asp:LinkButton>
@@ -628,7 +707,11 @@
                                 </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align: right;">
-
+                                
+                                <asp:LinkButton ID="lnkfolio" OnClick="lnkfolio_Click" OnClientClick="LoadPage();" CssClass="btn btn-warning btn-flat btng"
+                                    runat="server">
+                                    <i class="fa fa-window-restore" aria-hidden="true"></i>&nbsp;
+                                    Relacionar a Proyecto</asp:LinkButton>
                                 <asp:LinkButton ID="lnkterminacíon" OnClick="lnkterminacíon_Click" OnClientClick="LoadPage();" CssClass="btn btn-danger btn-flat btng"
                                     runat="server">
                                     <i class="fa fa-handshake-o" aria-hidden="true"></i>&nbsp;
@@ -721,6 +804,54 @@
                                                         <td><%# Convert.ToDateTime(Eval("fecha")).ToString("dddd dd MMMM, yyyy", System.Globalization.CultureInfo.CreateSpecificCulture("es-MX")) %></td>
                                                         <td><%# Eval("lugar") %></td>
                                                         <td><%# Eval("Estatus") %></td>
+                                                    </tr>
+                                                </ItemTemplate>
+                                            </asp:Repeater>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="tab_pend" runat="server">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h5><strong><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Pendientes del Proyecto</strong>
+                                </h5> 
+                            </div>
+                                 <div class="col-lg-12">
+
+                                <div class="table table-responsive">
+                                    <table class="table table-responsive table-bordered table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 40px"></th>
+                                                <th >Compromiso</th>
+                                                <th >Minuta</th>
+                                                <th style="width: 250px;">Recurso Asignado</th>
+                                                <th style="width: 170px;">Fecha de Cierre</th>
+                                                <th style="width: 80px;">% Avance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <asp:Repeater ID="repeat_pendientes" runat="server">
+                                                <ItemTemplate>
+                                                    <tr>
+                                                        <td style="text-align: center">
+                                                            <asp:LinkButton ID="lnkeditarpendientes" runat="server" 
+                                                                OnClick="lnkeditarpendientes_Click" CommandName="Terminar"
+                                                                CssClass="btn btn-primary btn-flat" Visible='<%# Convert.ToBoolean(Eval("PUEDE_EDITAR")) %>'
+                                                                CommandArgument='<%# Eval("id_minpendiente") %>'>
+                                                                     <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                            </asp:LinkButton>
+                                                        </td>                                                        
+                                                        <td style="font-size:12px"><%# Eval("descripcion").ToString().ToUpper() %></td> 
+                                                        <td style="font-size:12px"><%# Eval("minuta") %></td>
+                                                        <td style="font-size:12px"><%# Eval("responsable") %></td>
+                                                        <td  style="font-size:12px"><%# Convert.ToDateTime(Eval("fecha_planeada")).ToString("dddd dd MMMM, yyyy", System.Globalization.CultureInfo.CreateSpecificCulture("es-MX")) %></td>
+                                                       
+                                                        <td style="font-size:12px;text-align:center;"><%# Eval("avance") %></td>
                                                     </tr>
                                                 </ItemTemplate>
                                             </asp:Repeater>
@@ -874,63 +1005,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12" style="display: none;">
-            <div class="box box-danger">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Tareas</h3>
-
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div class="table-responsive">
-                        <telerik:RadGrid runat="server" ID="grid_tareas" Skin="Metro">
-                            <MasterTableView AutoGenerateColumns="false" CssClass="dvv table table-responsive"
-                                HeaderStyle-BackColor="White" HeaderStyle-ForeColor="Black"
-                                Width="100%">
-                                <Columns>
-                                    <telerik:GridTemplateColumn>
-                                        <HeaderStyle Width="30px" />
-                                        <ItemStyle HorizontalAlign="Center" />
-                                        <ItemTemplate>
-                                            <asp:LinkButton ID="LinkButton1" runat="server" CommandName="Editar" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "id_tarea").ToString() %>'>
-                                                <i class="fa fa-pencil fa-2x" aria-hidden="true"></i>
-                                            </asp:LinkButton>
-                                        </ItemTemplate>
-                                    </telerik:GridTemplateColumn>
-                                    <telerik:GridTemplateColumn>
-                                        <HeaderStyle Width="30px" />
-                                        <ItemStyle HorizontalAlign="Center" />
-                                        <ItemTemplate>
-                                            <asp:LinkButton ID="LinkButton2" OnClientClick="return confirm('¿Desea Eliminar esta Tarea?');" runat="server" CommandName="Eliminar" CommandArgument='<%# DataBinder.Eval(Container.DataItem, "id_tarea").ToString() %>'>
-                                                <i class="fa fa-trash fa-2x" aria-hidden="true"></i>
-                                            </asp:LinkButton>
-                                        </ItemTemplate>
-                                    </telerik:GridTemplateColumn>
-                                    <telerik:GridBoundColumn DataField="tarea_corta" HeaderText="Tareas" UniqueName="tarea_corta"
-                                        Visible="true">
-                                    </telerik:GridBoundColumn>
-                                    <telerik:GridBoundColumn DataField="avance" HeaderText="% Avance" UniqueName="avance"
-                                        Visible="true">
-                                        <HeaderStyle Width="70px" />
-                                        <ItemStyle HorizontalAlign="Center" />
-                                    </telerik:GridBoundColumn>
-                                    <telerik:GridBoundColumn DataField="recursos" HeaderText="Recursos" UniqueName="recursos"
-                                        Visible="true">
-                                        <HeaderStyle Width="130px" />
-                                    </telerik:GridBoundColumn>
-                                </Columns>
-                            </MasterTableView>
-                        </telerik:RadGrid>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="col-lg-8 col-md-8 col-sm-12">
             <div class="box box-danger">
                 <div class="box-header with-border">
                     <h3 class="box-title">Mapa de Tareas
@@ -943,29 +1018,93 @@
                 </div>
                 <div class="box-body">
                     <div class="row">
-                        <div class="col-lg-12">
+                        <asp:UpdatePanel ID="UpdatePanel4" runat="server" UpdateMode="Always">
+                            <ContentTemplate>
+                                <div class="col-lg-12 right" style="text-align: right">
+                                    <div class="btn-group">
+                                        <asp:LinkButton ID="lnkvistamapa" CssClass="btn btn-primary btn-flat" 
+                                            OnClick="lnkvistamapa_Click" runat="server"><i class="fa fa-indent" aria-hidden="true"></i></asp:LinkButton>
+                                        <asp:LinkButton ID="lnkvistatabla" CssClass="btn btn-default btn-flat" 
+                                            OnClick="lnkvistamapa_Click" runat="server"><i class="fa fa-table" aria-hidden="true"></i></asp:LinkButton>
+                                    </div>
+                                </div>
+                               
+                                <div class="col-lg-12" id="div_tareas_tabla" runat="server" visible="false">
+                                    <div style="text-align: left;" class="input-group input-group-sm">
+                                        <asp:TextBox ID="txtbuscartarea" CssClass="form-control" placeholder="Buscar"
+                                            runat="server"></asp:TextBox>
+                                        <span class="input-group-btn">
+                                            <asp:LinkButton ID="lnkbuscartareafiltro" CssClass="btn btn-primary btn-flat" runat="server"
+                                                OnClientClick="ChangedTextLoad5();" OnClick="lnkbuscartareafiltro_Click">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </asp:LinkButton>
+                                        </span>
 
-                            <asp:UpdatePanel ID="UpdatePanel4" runat="server" UpdateMode="Always">
-                                <ContentTemplate>
+
+                                        <asp:Image ID="imgbtarea" Style="display: none;" ImageUrl="~/img/load.gif" runat="server" />
+                                        <label id="lblbtarea" runat="server" style="display: none; color: #1565c0">Buscando Tarea</label>
+                                    </div>
+                                    <div class=" table table-responsive" style="width: 100%; height: 300px; overflow: scroll;">
+                                        <table id="tabla_tareas" class="table table table-responsive table-bordered table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 40px"></th>
+                                                    <th style="width: 250px">Tarea</th>
+                                                    <th style="width: 80px">% Avance</th>
+                                                    <th style="width: 160px">Fecha Planeada</th>
+                                                    <th style="width: 130px">Recursos</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <asp:Repeater ID="grid_tareas" runat="server">
+                                                    <ItemTemplate>
+                                                        <tr>
+                                                            <td style="text-align: center; width: 40px">
+                                                                <asp:UpdatePanel ID="UPDAREPE" runat="server">
+                                                                    <ContentTemplate>
+
+                                                                        <button onclick='<%# "return CargarTarea("+Eval("id_tarea").ToString().Trim()+");" %>'
+                                                                            class="btn btn-primary btn-sm">
+                                                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                                        </button>
+                                                                    </ContentTemplate>
+                                                                </asp:UpdatePanel>
+                                                            </td>
+                                                            <td style="font-size: 12px; width: 250px"><%# Eval("tarea_corta").ToString().ToUpper() %></td>
+                                                            <td style="text-align: center; width: 80px"><%# Eval("avance").ToString().ToUpper() %></td>
+                                                            <td style="font-size: 12px; width: 160px"><%# Convert.ToDateTime(Eval("fecha_fin")).ToString("dddd dd MMMM, yyyy", System.Globalization.CultureInfo.CreateSpecificCulture("es-MX")) %></td>
+                                                            <td style="font-size: 11px; width: 130px"><%# Eval("recursos") %></td>
+                                                        </tr>
+                                                    </ItemTemplate>
+                                                </asp:Repeater>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" id="div_tareas_arbol" runat="server" visible="true">
+
 
                                     <div style="text-align: right; display: none;">
                                         <label>Buscar</label>
                                         <telerik:RadTextBox ID="rtxtxsearchtarea" AutoPostBack="true" Width="200px" runat="server" OnTextChanged="rtxtxsearchtarea_TextChanged" Skin="Bootstrap"></telerik:RadTextBox>
                                     </div>
-                                    <telerik:RadTreeView RenderMode="Lightweight" ID="rtrvProyectWorks" runat="server" Width="100%" OnClientNodeClicked="ClientNodeClicked" Style="background-color: white;" Skin="Bootstrap" OnNodeClick="rtrvProyectWorks_NodeClick">
+                                    <telerik:RadTreeView RenderMode="Lightweight" ID="rtrvProyectWorks" runat="server" Width="100%"
+                                        Style="background-color: white;" Skin="Bootstrap" OnNodeClick="rtrvProyectWorks_NodeClick">
                                         <DataBindings>
                                             <telerik:RadTreeNodeBinding Expanded="False"></telerik:RadTreeNodeBinding>
                                         </DataBindings>
                                     </telerik:RadTreeView>
-                                </ContentTemplate>
-                            </asp:UpdatePanel>
-                        </div>
+
+                                </div>
+
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="col-lg-4 col-md-4 col-sm-12">
 
             <div class="box box-danger">
                 <div class="box-header with-border">
@@ -983,7 +1122,7 @@
                         <ul class="nav nav-pills nav-stacked">
                             <asp:Repeater ID="repeater_docs" runat="server">
                                 <ItemTemplate>
-                                    <li class="active" style="background-color: #e0e0e0">
+                                    <li class="active" style="background-color: #e0e0e0; font-size:10px">
                                         <asp:LinkButton ID="LinkButton3" runat="server" OnClick="DownloadFile"
                                             CommandArgument='<%# Eval("id_documento") %>'>
                                                                         <i class='<%# Eval("icono").ToString() %>'></i>
@@ -1010,16 +1149,31 @@
                 </div>
                 <div class="box-body">
                     <div class="row">
-                        <div class="col-lg-12" id="div_chartentregables" runat="server">
-                            <div id="container" style="height: 365px; margin: 0 auto"></div>
-                            <asp:GridView ID="grid_entregables_hide" runat="server" AutoGenerateColumns="false" Style="display: none;">
-                                <Columns>
+                        <asp:UpdatePanel ID="UpdatePanel18" runat="server" UpdateMode="Always">
+                            <ContentTemplate>
+                                <div class="col-lg-12 right" style="text-align: right">
+                                    <div class="btn-group">
+                                        <asp:LinkButton ID="lnkvistagraficas" CssClass="btn btn-primary btn-flat" OnClick="lnkvistagraficas_Click" runat="server">
+                                            <i class="fa fa-bar-chart" aria-hidden="true"></i></asp:LinkButton>
+                                        <asp:LinkButton ID="lnkmailsvistatabla" CssClass="btn btn-default btn-flat" OnClick="lnkvistagraficas_Click" runat="server"><i class="fa fa-table" aria-hidden="true"></i></asp:LinkButton>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" id="div_mailstablas" runat="server" visible="false">
+                                    <h5>Vista Aun No Disponible</h5>
+                                </div>
+                                <div class="col-lg-12" id="div_chartentregables" runat="server">
+                                    <div id="container" style="height: 365px; margin: 0 auto"></div>
+                                    <asp:GridView ID="grid_entregables_hide" runat="server" AutoGenerateColumns="false" Style="display: none;">
+                                        <Columns>
 
-                                    <asp:BoundField DataField="entregable_name" HeaderText="entregable"></asp:BoundField>
-                                    <asp:BoundField DataField="avance" HeaderText="avance"></asp:BoundField>
-                                </Columns>
-                            </asp:GridView>
-                        </div>
+                                            <asp:BoundField DataField="entregable_name" HeaderText="entregable"></asp:BoundField>
+                                            <asp:BoundField DataField="avance" HeaderText="avance"></asp:BoundField>
+                                        </Columns>
+                                    </asp:GridView>
+                                </div>
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+
                     </div>
                 </div>
                 <div class="box-footer clearfix">
@@ -1167,7 +1321,7 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <h5><strong><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Nombre del Milestones</strong></h5>
+                                    <h5><strong><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Nombre del Milestone</strong></h5>
                                     <telerik:RadTextBox ID="rtxtentregable" Width="100%" runat="server" Skin="Bootstrap"></telerik:RadTextBox>
                                 </div>
                                 <div class="col-lg-12">
@@ -1209,7 +1363,7 @@
                                             <i class="fa fa-refresh fa-spin fa-fw"></i>
                                             <span class="sr-only">Loading...</span>&nbsp;Guardando Milestone...
                             </asp:LinkButton>
-                            <asp:LinkButton ID="lnkGuardarEntregable" OnClick="lnkGuardarEntregable_Click" OnClientClick="return ConfirmMilestoneModal('¿Desea Guardar el Entregable?');" CssClass="btn btn-primary btn-flat" runat="server">
+                            <asp:LinkButton ID="lnkGuardarEntregable" OnClick="lnkGuardarEntregable_Click" OnClientClick="return ConfirmMilestoneModal('¿Desea Guardar el Milestone?');" CssClass="btn btn-primary btn-flat" runat="server">
                                             <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Guardar
                             </asp:LinkButton>
                         </div>
@@ -1223,6 +1377,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <asp:UpdatePanel ID="UpdatePanel5" runat="server">
                 <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="lnkselectedtarea" EventName="Click" />
                     <asp:AsyncPostBackTrigger ControlID="rtrvProyectWorks" EventName="NodeClick" />
                 </Triggers>
                 <ContentTemplate>
@@ -1494,7 +1649,8 @@
                             <asp:LinkButton ID="lnkcargandoMinuta" CssClass="btn btn-primary btn-flat" runat="server" OnClientClick="return false;" Style="display: none;">
                                         <i class="fa fa-refresh fa-spin fa-fw"></i>
                                             <span class="sr-only">Loading...</span>&nbsp;Guardando Minuta...</asp:LinkButton>
-                            <asp:LinkButton ID="lnkguardarminuta" runat="server" CssClass="btn btn-primary btn-flat" OnClick="lnkguardarminuta_Click" OnClientClick="return ConfirmMinutaModal('¿Desea Agregar Esta Minuta?');">
+                            <asp:LinkButton ID="lnkguardarminuta" runat="server" CssClass="btn btn-primary btn-flat" OnClick="lnkguardarminuta_Click" 
+                                OnClientClick="return ConfirmMinutaModal('¿Desea Agregar Esta Minuta?');">
                                     <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Guardar
                             </asp:LinkButton>
                         </div>
@@ -1631,6 +1787,12 @@
                                     <h5><strong><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;Fecha Planeada</strong></h5>
                                     <telerik:RadDatePicker ID="rdtfecha_planeada" Width="100%" Skin="Bootstrap" runat="server"></telerik:RadDatePicker>
                                 </div>
+                                 <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <h5><strong><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;Avance</strong></h5>
+                                    
+                                    <asp:TextBox ID="txtavancependientes" CssClass=" form-control"  runat="server"  type="number" onkeypress="return validarEnteros(event);"
+                                         onpaste="return false;"></asp:TextBox>
+                                </div>
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-briefcase" aria-hidden="true"></i>&nbsp;Pendiente</strong></h5>
                                     <telerik:RadTextBox ID="rtxtpendiente" Width="100%" runat="server" Skin="Bootstrap" TextMode="MultiLine" Rows="2"></telerik:RadTextBox>
@@ -1638,7 +1800,7 @@
                                 <div class="col-lg-12">
                                     <h5><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Puede Seleccionar un Involucrado del Proyecto</strong></h5>
 
-                                    <div style="height: 150px; overflow: scroll;">
+                                    <div style="height: 120px; overflow: scroll;">
                                         <telerik:RadListBox RenderMode="Lightweight"   Style="font-size: 11px" runat="server" ID="rdlinvopendientes" Width="100%" Skin="Bootstrap" SelectionMode="Multiple">
                                         </telerik:RadListBox>
                                     </div>
@@ -1710,6 +1872,63 @@
 
                             <asp:LinkButton ID="lnkaddpendientes" CssClass="btn btn-success btn-flat" OnClick="lnkaddpendientes_Click" OnClientClick="return confirm('¿Desea Agregar Este Pendiente?');" runat="server">
                                             Agregar Pendiente&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>
+                            </asp:LinkButton>
+                        </div>
+                    </div>
+                </ContentTemplate>
+            </asp:UpdatePanel>
+        </div>
+    </div>
+
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" id="myModalPendientesTab" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <asp:UpdatePanel ID="UpdatePanel17" runat="server">
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="lnkguardapendiente" EventName="Click" />
+                </Triggers>
+                <ContentTemplate>
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title">Pendientes</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <h5><strong><i class="fa fa-calendar" aria-hidden="true"></i>&nbsp;Fecha Planeada</strong></h5>
+                                    <telerik:RadDatePicker ID="rdpfecha_planeada_tab" Width="100%" Skin="Bootstrap" runat="server"></telerik:RadDatePicker>
+                                </div>
+                                 <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <h5><strong><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;Avance</strong></h5>
+                                    
+                                    <asp:TextBox ID="txtavancetab" CssClass=" form-control"  runat="server"  type="number" onkeypress="return validarEnteros(event);"
+                                         onpaste="return false;"></asp:TextBox>
+                                </div>
+                                <div class="col-lg-12">
+                                    <h5><strong><i class="fa fa-briefcase" aria-hidden="true"></i>&nbsp;Pendiente</strong></h5>
+                                    <telerik:RadTextBox ID="rtxtpendiente_tab" Width="100%" runat="server" Skin="Bootstrap" TextMode="MultiLine" Rows="2"></telerik:RadTextBox>
+                                </div>
+                            </div>
+                            <asp:TextBox ID="txtid_minpendiente" Visible="false" runat="server"></asp:TextBox>
+                        </div>
+                        <div class="modal-footer ">
+
+                            <div class="row" id="diverrormodalpendientestab" runat="server" visible="false" style="text-align: left;">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                        <asp:Label ID="lblerrorpendtab" runat="server" Text=""></asp:Label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
+                              <asp:LinkButton ID="lnkcargaguardapendiente" CssClass="btn btn-primary btn-flat" runat="server" OnClientClick="return false;" Style="display: none;">
+                                        <i class="fa fa-refresh fa-spin fa-fw"></i>
+                                            <span class="sr-only">Loading...</span>&nbsp;Guardando  Pendiente...</asp:LinkButton>
+                            <asp:LinkButton ID="lnkguardapendiente" CssClass="btn btn-primary btn-flat" OnClick="lnkguardapendiente_Click" 
+                                 OnClientClick="return ConfirmPendienteModal('¿Desea Guardar Este Pendiente?');" runat="server">
+                                             <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Guardar Pendiente
                             </asp:LinkButton>
                         </div>
                     </div>
@@ -1899,13 +2118,13 @@
                         <div class="modal-body">
 
                             <div class="row" id="div_listaclientes" runat="server" visible="false">
-                                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-
+                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                  
                                     <h5><strong><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Seleccione un Cliente</strong></h5>
-                                    <div style="text-align: left;">
+                                    <div style="text-align: left;" class="input-group input-group-sm">
                                         <asp:TextBox ID="txtbuscarclientes" CssClass="form-control" placeholder="Buscar"  runat="server"></asp:TextBox>
                                         <span class="input-group-btn">
-                                            <asp:LinkButton ID="lnkbuscarcliente" CssClass="btn btn-primary btn-flat" runat="server" OnClientClick="return ChangedTextLoad3();" OnClick="lnkbuscarcliente_Click">
+                                            <asp:LinkButton ID="lnkbuscarcliente" CssClass="btn btn-primary" runat="server" OnClientClick="return ChangedTextLoad3();" OnClick="lnkbuscarcliente_Click">
                                                 <i class="fa fa-search" aria-hidden="true"></i>
                                             </asp:LinkButton>
                                         </span>
@@ -1915,7 +2134,7 @@
                                     <label id="lblloadcliente" runat="server" style="display: none; color: #1565c0">Buscando Clientes</label>
                                 </div>
                                 <div  class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div style="height: 100px; overflow: scroll;">
+                                    <div style="height: 150px; overflow: scroll;">
                                     <telerik:RadListBox Style="font-size: 10px" RenderMode="Lightweight" runat="server" ID="rdlclientes" Width="100%"
                                         Skin="Bootstrap" SelectionMode="Single" OnSelectedIndexChanged="rdlclientes_SelectedIndexChanged" AutoPostBack="true">
                                     </telerik:RadListBox>
@@ -2237,12 +2456,84 @@
             </div>
         </div>
     </div>
+    
+    <div class="modal fade bs-example-modal-xs" tabindex="-1" id="myModalFolio" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xs" role="document">
 
+            <div class="modal-content">
+                <asp:UpdatePanel ID="jdjdjdjd" runat="server" >
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="lnkfolio" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="lnkguardarfolio" EventName="Click" />
+                    </Triggers>
+                    <ContentTemplate>
+                        
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title">Folio de Proyecto Interno</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h5><strong><i class="fa fa-window-restore" aria-hidden="true"></i>&nbsp;Seleccione un proyecto interno para relacionarlo</strong></h5>
+                            <div style="text-align: left;" class="input-group input-group-sm">
+                                <asp:TextBox ID="txtbuscarfolio" CssClass="form-control" placeholder="Buscar"
+                                    runat="server"></asp:TextBox>
+                                <span class="input-group-btn">
+                                    <asp:LinkButton ID="lnkbuscarfolio" CssClass="btn btn-primary btn-flat" runat="server" 
+                                        OnClientClick="ChangedTextLoad4();" OnClick="lnkbuscarfolio_Click">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                    </asp:LinkButton>
+                                </span>
+                            </div>
+
+                            <asp:Image ID="imgfolio" Style="display: none;" ImageUrl="~/img/load.gif" runat="server" />
+                            <label id="lblfolio" runat="server" style="display: none; color: #1565c0">Buscando Proyectos</label>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                            <div style="height: 200px; overflow: scroll;">
+
+                                <telerik:RadListBox RenderMode="Lightweight" runat="server" ID="rdlproyectos" Style="font-size: 11px" Width="100%"
+                                    Skin="Bootstrap" SelectionMode="Single">
+                                </telerik:RadListBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <div class="row" id="diverrorfolio" runat="server" visible="false" style="text-align: left;">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                <asp:Label ID="lblerrorfolio" runat="server" Text=""></asp:Label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cerrar</button>
+                    <asp:LinkButton OnClientClick="return false;" ID="lnkcargandoguardarfolio" CssClass="btn btn-primary btn-flat" runat="server" Style="display: none;">
+                                            <i class="fa fa-refresh fa-spin fa-fw"></i>
+                                            <span class="sr-only">Loading...</span>&nbsp;Relacionando Proyecto...
+                    </asp:LinkButton>
+                    <asp:LinkButton ID="lnkguardarfolio" CssClass="btn btn-primary btn-flat" OnClick="lnkguardarfolio_Click"
+                        OnClientClick="return ConfirmRelacionFolio('¿Desea Guardar esta Información?');" runat="server">
+                                           <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Guardar
+                    </asp:LinkButton>
+                </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+            </div>
+        </div>
+    </div>
+    
     <asp:HiddenField ID="hdfid_entregable" runat="server" />
+    <asp:HiddenField ID="hdfid_tarea" runat="server" />
     <asp:HiddenField ID="hdfid_proyecto" runat="server" />
     <asp:HiddenField ID="hdfid_cliente" runat="server" />
     <asp:HiddenField ID="hdfid_involucrado" runat="server" />
     <asp:HiddenField ID="hdfmotivos" runat="server" />
     <asp:Button ID="btneditarentregablegraph" runat="server" Text="Button" Style="display: none;" OnClick="btneditarentregablegraph_Click" />
     <asp:Button ID="btneditarinvol" runat="server" Text="Button" Style="display: none;" OnClick="btneditarinvol_Click" />
+    <asp:Button ID="lnkselectedtarea" runat="server" Text="Button" Style="display: none;" OnClick="lnkselectedtarea_Click" />
 </asp:Content>

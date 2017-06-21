@@ -25,6 +25,10 @@ namespace datos.Modelos
         [StringLength(8000)]
         public string img_profile { get; set; }
 
+        public bool vista_arbol_mapa_tareas { get; set; }
+
+        public bool vista_grafica_milestones { get; set; }
+
         public DateTime fecha_registro { get; set; }
 
         [StringLength(50)]

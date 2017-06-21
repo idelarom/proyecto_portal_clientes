@@ -74,6 +74,9 @@
     <script src="dist/js/app.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <style type="text/css">
         .skin-blue .main-header .navbar .sidebar-toggle:hover {
             background-color: #C42C2C;
@@ -187,7 +190,24 @@
             var size = (Object.files[0].size) / 1000000;
             if (size > size_max) {
                 Object.value = "";
-                swal("Mensaje del sistema", "El tamaño maximo para la subida de archivos es " + size_max + " mb.", "error");
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-top-full-width",
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "4000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                toastr.info("El tamaño maximo para la subida de este archivo es " + size_max + " mb.", "Información del sistema");
                 return false;
             } else {
                 return true;
@@ -260,6 +280,8 @@
                                     </li>
                                     <!-- Menu Footer-->
                                     <li class="user-footer">
+                                        <asp:LinkButton ID="lnkdescargamanual" OnClick="lnkdescargamanual_Click" runat="server" CssClass="btn btn-default btn-flat">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;Manual de Usuario</asp:LinkButton>
                                         <div class="pull-left"><asp:LinkButton ID="lnkconfig" runat="server" CssClass="btn btn-default btn-flat" 
                                              OnClientClick="ModalShow('#myModalUserConfig');" OnClick="lnkconfig_Click">
                                             <i class="fa fa-cog" aria-hidden="true"></i>&nbsp;Preferencias</asp:LinkButton>

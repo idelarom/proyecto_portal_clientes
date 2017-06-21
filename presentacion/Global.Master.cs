@@ -179,5 +179,20 @@ namespace presentacion
                 Alert.ShowAlertError(ex.ToString(), this.Page);
             }
         }
+
+        protected void lnkdescargamanual_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/documentation/"));
+                string url = dirInfo.ToString().Trim() + "manual_usuario.pdf";
+                funciones.Download(url,"manual_usuario.pdf",this.Page);
+            }
+            catch (Exception ex)
+            {
+
+                Alert.ShowAlertError(ex.ToString(), this.Page);
+            }
+        }
     }
 }

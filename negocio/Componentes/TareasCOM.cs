@@ -326,7 +326,7 @@ namespace negocio.Componentes
                 dt.Columns.Add("tarea_corta");
                 foreach (DataRow row in dt.Rows)
                 {
-                    row["tarea_corta"] = row["tarea"].ToString().Length > 35 ? row["tarea"].ToString().Substring(0, 35) + "..." : row["tarea"].ToString();
+                    row["tarea_corta"] = row["tarea"].ToString().Length > 27 ? row["tarea"].ToString().Substring(0, 27) + "..." : row["tarea"].ToString();
                 }
                 return dt;
             }

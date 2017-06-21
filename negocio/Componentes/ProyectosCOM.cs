@@ -132,6 +132,34 @@ namespace negocio.Componentes
                 return fullErrorMessage.ToString();
             }
         }
+
+        public string RelacionarFolio(proyectos entidad)
+        {
+            try
+            {
+                Model context = new Model();
+                proyectos proyecto = context.proyectos
+                                .First(i => i.id_proyecto == entidad.id_proyecto);
+                proyecto.folio_pmt = entidad.folio_pmt;
+                proyecto.usuario_edicion = entidad.usuario_edicion;
+                proyecto.fecha_edicion = DateTime.Now;
+                context.SaveChanges();
+                return "";
+            }
+            catch (DbEntityValidationException ex)
+            {
+                // Retrieve the error messages as a list of strings.
+                var errorMessages = ex.EntityValidationErrors
+                        .SelectMany(x => x.ValidationErrors)
+                        .Select(x => x.ErrorMessage);
+
+                // Join the list to a single string.
+                var fullErrorMessage = string.Join("; ", errorMessages);
+
+                return fullErrorMessage.ToString();
+            }
+        }
+
         public string CorreoBienvenida(int id_proyecto)
         {
             try
@@ -252,7 +280,7 @@ namespace negocio.Componentes
             }
             return ds;
         }
-        public DataSet sp_get_proyects_info(int id_proyecto, string usuario, bool administrador, int id_cliente, string usuario_filtro)
+        public DataSet sp_get_proyects_info(int id_proyecto, string usuario, bool administrador, int id_cliente, string usuario_filtro, bool terminado)
         {
             DataSet ds = new DataSet();
             List<SqlParameter> listparameters = new List<SqlParameter>();
@@ -262,6 +290,7 @@ namespace negocio.Componentes
             listparameters.Add(new SqlParameter() { ParameterName = "@padministrador", SqlDbType = SqlDbType.Bit, Value = administrador });
             listparameters.Add(new SqlParameter() { ParameterName = "@pid_cliente", SqlDbType = SqlDbType.Bit, Value = id_cliente });
             listparameters.Add(new SqlParameter() { ParameterName = "@pusuario_filtro", SqlDbType = SqlDbType.VarChar, Value = usuario_filtro });
+            listparameters.Add(new SqlParameter() { ParameterName = "@terminado", SqlDbType = SqlDbType.VarChar, Value = terminado });
             try
             {
                 //ds = data.datos_Clientes(listparameters);
@@ -284,6 +313,25 @@ namespace negocio.Componentes
             {
                 //ds = data.datos_Clientes(listparameters);
                 ds = data.enviar("sp_listado_empleados_proyecto", listparameters, false, 1);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return ds;
+        }
+
+
+        public DataSet sp_GetConnextProjectsForClients(string filtro)
+        {
+            DataSet ds = new DataSet();
+            List<SqlParameter> listparameters = new List<SqlParameter>();
+            Datos data = new Datos();
+            listparameters.Add(new SqlParameter() { ParameterName = "@pfiltro", SqlDbType = SqlDbType.Int, Value = filtro });
+            try
+            {
+                //ds = data.datos_Clientes(listparameters);
+                ds = data.enviar("sp_GetConnextProjectsForClients", listparameters, false,4);
             }
             catch (Exception ex)
             {

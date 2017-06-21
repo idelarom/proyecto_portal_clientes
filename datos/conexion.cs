@@ -103,6 +103,9 @@ namespace datos
                     case 3:
                         cadena = System.Configuration.ConfigurationManager.ConnectionStrings["ModelOPT"].ToString();
                         break;
+                    case 4:
+                        cadena = System.Configuration.ConfigurationManager.ConnectionStrings["ModelPMT"].ToString();
+                        break;
                 }
             }
             catch (Exception ex)

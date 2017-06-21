@@ -28,7 +28,9 @@ namespace negocio.Componentes
                         id_uperfil = entidad.id_uperfil,
                         password = entidad.password,
                         usuario = entidad.usuario,
-                        fecha_registro = DateTime.Now
+                        fecha_registro = DateTime.Now,
+                        vista_arbol_mapa_tareas = true,
+                        vista_grafica_milestones =true
                     };
                     context.usuarios.Add(usuario);
                     context.SaveChanges();
@@ -90,6 +92,62 @@ namespace negocio.Componentes
                 usuarios usuario = context.usuarios
                                 .First(i => i.id_usuario == entidad.id_usuario);
                 usuario.img_profile = entidad.img_profile;
+                usuario.fecha_edicion = DateTime.Now;
+                usuario.usuario_edicion = entidad.usuario_edicion;
+                context.SaveChanges();
+                return "";
+            }
+            catch (DbEntityValidationException ex)
+            {
+                // Retrieve the error messages as a list of strings.
+                var errorMessages = ex.EntityValidationErrors
+                        .SelectMany(x => x.ValidationErrors)
+                        .Select(x => x.ErrorMessage);
+
+                // Join the list to a single string.
+                var fullErrorMessage = string.Join("; ", errorMessages);
+
+                return fullErrorMessage.ToString();
+            }
+        }
+
+        public string EditarVistasMapaTareas(usuarios entidad)
+        {
+            try
+            {
+
+                Model context = new Model();
+                usuarios usuario = context.usuarios
+                                .First(i => i.id_usuario == entidad.id_usuario);
+                usuario.vista_arbol_mapa_tareas = entidad.vista_arbol_mapa_tareas;
+                usuario.fecha_edicion = DateTime.Now;
+                usuario.usuario_edicion = entidad.usuario_edicion;
+                context.SaveChanges();
+                return "";
+            }
+            catch (DbEntityValidationException ex)
+            {
+                // Retrieve the error messages as a list of strings.
+                var errorMessages = ex.EntityValidationErrors
+                        .SelectMany(x => x.ValidationErrors)
+                        .Select(x => x.ErrorMessage);
+
+                // Join the list to a single string.
+                var fullErrorMessage = string.Join("; ", errorMessages);
+
+                return fullErrorMessage.ToString();
+            }
+        }
+
+        public string EditarVistasMilestones(usuarios entidad)
+        {
+            try
+            {
+
+                Model context = new Model();
+                usuarios usuario = context.usuarios
+                                .First(i => i.id_usuario == entidad.id_usuario);
+                usuario.vista_grafica_milestones = entidad.vista_grafica_milestones;
                 usuario.fecha_edicion = DateTime.Now;
                 usuario.usuario_edicion = entidad.usuario_edicion;
                 context.SaveChanges();
@@ -359,7 +417,28 @@ namespace negocio.Componentes
                 return dt;
             }
         }
-
+        public DataTable GetTiposUsuarios()
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                Model context = new Model();
+                var query = context.usuarios_perfiles
+                                .Where(s => s.id_uperfil == s.id_uperfil)
+                                .Select(u => new
+                                {
+                                    u.id_uperfil,
+                                    u.perfil
+                                })
+                                .OrderBy(u => u.perfil);
+                dt = To.DataTable(query.ToList());
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                return dt;
+            }
+        }
         public Boolean ExistUserCliente(int id_cliente)
         {
             DataTable dt = new DataTable();
