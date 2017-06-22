@@ -155,6 +155,13 @@
             $("#<%= imgbtarea.ClientID%>").show();
             $("#<%=lblbtarea.ClientID%>").show();
             return true;
+      }
+        
+      function ChangedTextLoad6()
+        {            
+            $("#<%= imgbmilestone.ClientID%>").show();
+            $("#<%=lblbmilestone.ClientID%>").show();
+            return true;
         }
         function OpenModalEntregableForGraph(id_entregable) {
             // alert('ID ' + id_entregable);
@@ -164,8 +171,9 @@
 
             myHidden.value = id_entregable;
             document.getElementById('<%= btneditarentregablegraph.ClientID%>').click();
+            return false;
         }
-
+           
         function ConfirmExcelModal(msg) {
             if (confirm(msg)) {
                 $("#<%= lnkloadingexcel.ClientID%>").show();
@@ -623,6 +631,47 @@
             document.getElementById('<%= lnkselectedtarea.ClientID%>').click();
             return false;
         }
+
+        function ShowHideGrafica()
+        {
+            var div_mailstablas = $('#<%= div_mailstablas.ClientID%>').css('display');
+            var div_chartentregables = $('#<%= div_chartentregables.ClientID%>').css('display');
+           
+            if (div_chartentregables == 'none') {
+                $('#<%= div_chartentregables.ClientID%>').css("display","block");
+            } else {
+                $('#<%= div_chartentregables.ClientID%>').css("display","none");
+
+            }
+           
+            if (div_mailstablas == 'none') {
+                $('#<%= div_mailstablas.ClientID%>').css("display","block");
+            } else {
+                $('#<%= div_mailstablas.ClientID%>').css("display","none");
+
+            }
+            return true;
+        }
+        function ShowHideTareas()
+        {
+            var div_tareas_tabla = $('#<%= div_tareas_tabla.ClientID%>').css('display');
+            var div_tareas_arbol = $('#<%= div_tareas_arbol.ClientID%>').css('display');
+           
+            if (div_tareas_tabla == 'none') {
+                $('#<%= div_tareas_tabla.ClientID%>').css("display","block");
+            } else {
+                $('#<%= div_tareas_tabla.ClientID%>').css("display","none");
+
+            }
+           
+            if (div_tareas_arbol == 'none') {
+                $('#<%= div_tareas_arbol.ClientID%>').css("display","block");
+            } else {
+                $('#<%= div_tareas_arbol.ClientID%>').css("display","none");
+
+            }
+            return true;
+        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -1022,14 +1071,14 @@
                             <ContentTemplate>
                                 <div class="col-lg-12 right" style="text-align: right">
                                     <div class="btn-group">
-                                        <asp:LinkButton ID="lnkvistamapa" CssClass="btn btn-primary btn-flat" 
+                                        <asp:LinkButton ID="lnkvistamapa" CssClass="btn btn-primary btn-flat" OnClientClick="return ShowHideTareas();"
                                             OnClick="lnkvistamapa_Click" runat="server"><i class="fa fa-indent" aria-hidden="true"></i></asp:LinkButton>
-                                        <asp:LinkButton ID="lnkvistatabla" CssClass="btn btn-default btn-flat" 
+                                        <asp:LinkButton ID="lnkvistatabla" CssClass="btn btn-default btn-flat"  OnClientClick="return ShowHideTareas();"
                                             OnClick="lnkvistamapa_Click" runat="server"><i class="fa fa-table" aria-hidden="true"></i></asp:LinkButton>
                                     </div>
                                 </div>
                                
-                                <div class="col-lg-12" id="div_tareas_tabla" runat="server" visible="false">
+                                <div class="col-lg-12" id="div_tareas_tabla" runat="server">
                                     <div style="text-align: left;" class="input-group input-group-sm">
                                         <asp:TextBox ID="txtbuscartarea" CssClass="form-control" placeholder="Buscar"
                                             runat="server"></asp:TextBox>
@@ -1039,11 +1088,10 @@
                                                 <i class="fa fa-search" aria-hidden="true"></i>
                                             </asp:LinkButton>
                                         </span>
-
-
+                                    </div>
+                                    
                                         <asp:Image ID="imgbtarea" Style="display: none;" ImageUrl="~/img/load.gif" runat="server" />
                                         <label id="lblbtarea" runat="server" style="display: none; color: #1565c0">Buscando Tarea</label>
-                                    </div>
                                     <div class=" table table-responsive" style="width: 100%; height: 300px; overflow: scroll;">
                                         <table id="tabla_tareas" class="table table table-responsive table-bordered table-condensed">
                                             <thead>
@@ -1081,7 +1129,7 @@
                                         </table>
                                     </div>
                                 </div>
-                                <div class="col-lg-12" id="div_tareas_arbol" runat="server" visible="true">
+                                <div class="col-lg-12" id="div_tareas_arbol" runat="server">
 
 
                                     <div style="text-align: right; display: none;">
@@ -1150,29 +1198,77 @@
                 <div class="box-body">
                     <div class="row">
                         <asp:UpdatePanel ID="UpdatePanel18" runat="server" UpdateMode="Always">
+                            <Triggers>
+                            </Triggers>
                             <ContentTemplate>
                                 <div class="col-lg-12 right" style="text-align: right">
                                     <div class="btn-group">
-                                        <asp:LinkButton ID="lnkvistagraficas" CssClass="btn btn-primary btn-flat" OnClick="lnkvistagraficas_Click" runat="server">
+                                        <asp:LinkButton ID="lnkvistagraficas" CssClass="btn btn-primary btn-flat" OnClientClick="return ShowHideGrafica();"
+                                            OnClick="lnkvistagraficas_Click" runat="server">
                                             <i class="fa fa-bar-chart" aria-hidden="true"></i></asp:LinkButton>
-                                        <asp:LinkButton ID="lnkmailsvistatabla" CssClass="btn btn-default btn-flat" OnClick="lnkvistagraficas_Click" runat="server"><i class="fa fa-table" aria-hidden="true"></i></asp:LinkButton>
+                                        <asp:LinkButton ID="lnkmailsvistatabla" CssClass="btn btn-default btn-flat" OnClientClick="return ShowHideGrafica();"
+                                            OnClick="lnkvistagraficas_Click" runat="server"><i class="fa fa-table" aria-hidden="true"></i></asp:LinkButton>
                                     </div>
                                 </div>
-                                <div class="col-lg-12" id="div_mailstablas" runat="server" visible="false">
-                                    <h5>Vista Aun No Disponible</h5>
-                                </div>
-                                <div class="col-lg-12" id="div_chartentregables" runat="server">
-                                    <div id="container" style="height: 365px; margin: 0 auto"></div>
-                                    <asp:GridView ID="grid_entregables_hide" runat="server" AutoGenerateColumns="false" Style="display: none;">
-                                        <Columns>
+                                <div class="col-lg-12" id="div_mailstablas" runat="server">
+                                    <div style="text-align: left;" class="input-group input-group-sm">
+                                        <asp:TextBox ID="txtbuscarmilestones" CssClass="form-control" placeholder="Buscar"
+                                            runat="server"></asp:TextBox>
+                                        <span class="input-group-btn">
+                                            <asp:LinkButton ID="lnkbuscarmilestone" CssClass="btn btn-primary btn-flat" runat="server"
+                                                OnClientClick="ChangedTextLoad6();" OnClick="lnkbuscarmilestone_Click">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </asp:LinkButton>
+                                        </span>
+                                    </div>
 
-                                            <asp:BoundField DataField="entregable_name" HeaderText="entregable"></asp:BoundField>
-                                            <asp:BoundField DataField="avance" HeaderText="avance"></asp:BoundField>
-                                        </Columns>
-                                    </asp:GridView>
+                                    <asp:Image ID="imgbmilestone" Style="display: none;" ImageUrl="~/img/load.gif" runat="server" />
+                                    <label id="lblbmilestone" runat="server" style="display: none; color: #1565c0">Buscando Milestone</label>
+                                    <div class=" table table-responsive" style="width: 100%; height: 300px; overflow: scroll;">
+                                        <table id="tabla_milestones" class="table table table-responsive table-bordered table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 40px"></th>
+                                                    <th>Milestone</th>
+                                                    <th style="width: 80px">% Avance</th>
+                                                    <th style="width: 160px">Fecha Planeada</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <asp:Repeater ID="repeat_milestones" runat="server">
+                                                    <ItemTemplate>
+                                                        <tr>
+                                                            <td style="text-align: center;">
+
+                                                                <button onclick='<%# "return OpenModalEntregableForGraph("+Eval("id_entregable").ToString().Trim()+");" %>'
+                                                                    class="btn btn-primary btn-sm">
+                                                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                                </button>
+                                                            </td>
+                                                            <td style="font-size: 12px;"><%# Eval("entregable").ToString().ToUpper() %></td>
+                                                            <td style="text-align: center; width: 80px"><%# Eval("avance").ToString().ToUpper() %></td>
+                                                            <td style="font-size: 12px; width: 160px"><%# Convert.ToDateTime(Eval("fecha")).ToString("dddd dd MMMM, yyyy", System.Globalization.CultureInfo.CreateSpecificCulture("es-MX")) %></td>
+
+                                                        </tr>
+                                                    </ItemTemplate>
+                                                </asp:Repeater>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </ContentTemplate>
                         </asp:UpdatePanel>
+
+                        <div class="col-lg-12" id="div_chartentregables" runat="server">
+                            <div id="container" style="height: 365px; margin: 0 auto"></div>
+                            <asp:GridView ID="grid_entregables_hide" runat="server" AutoGenerateColumns="false" Style="display: none;">
+                                <Columns>
+
+                                    <asp:BoundField DataField="entregable_name" HeaderText="entregable"></asp:BoundField>
+                                    <asp:BoundField DataField="avance" HeaderText="avance"></asp:BoundField>
+                                </Columns>
+                            </asp:GridView>
+                        </div>
 
                     </div>
                 </div>

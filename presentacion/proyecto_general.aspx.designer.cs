@@ -607,6 +607,51 @@ namespace presentacion {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl div_mailstablas;
         
         /// <summary>
+        /// Control txtbuscarmilestones.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtbuscarmilestones;
+        
+        /// <summary>
+        /// Control lnkbuscarmilestone.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton lnkbuscarmilestone;
+        
+        /// <summary>
+        /// Control imgbmilestone.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image imgbmilestone;
+        
+        /// <summary>
+        /// Control lblbmilestone.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblbmilestone;
+        
+        /// <summary>
+        /// Control repeat_milestones.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater repeat_milestones;
+        
+        /// <summary>
         /// Control div_chartentregables.
         /// </summary>
         /// <remarks>
