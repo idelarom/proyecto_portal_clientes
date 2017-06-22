@@ -43,7 +43,6 @@
         $(document).ready(function () {
             IniciarEditor();
             Init();
-            // CargarGrafica();
         });
 
         function ClientNodeClicked(sender, eventArgs) {
