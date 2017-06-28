@@ -3,6 +3,9 @@ using negocio.Componentes;
 using System;
 using System.Data;
 using System.IO;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 
 namespace presentacion
 {
@@ -22,6 +25,7 @@ namespace presentacion
             }
             if (!IsPostBack)
             {
+                CargarMenu();
                 contraseña.Visible = Convert.ToBoolean(Session["cliente"]);
                 lnkguardarconfiguracion22.Visible = Convert.ToBoolean(Session["cliente"]);
                 string nombre = Session["nombre"] == null ? "" : Session["nombre"] as string;
@@ -44,6 +48,62 @@ namespace presentacion
             Response.Redirect(url);
         }
 
+
+        private DataTable TableMenu(int id_menu_padre)
+        {
+            try
+            {
+                bool admnistrador = Convert.ToBoolean(Session["administrador"]);
+                bool cliente = Convert.ToBoolean(Session["cliente"]);
+                MenuCOM menus = new MenuCOM();
+                DataSet ds = menus.ListadoMenus(id_menu_padre, admnistrador, "", cliente);
+                return ds.Tables[0];
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        protected void repeat_menu_ItemDataBound(object sender, System.Web.UI.WebControls.RepeaterItemEventArgs e)
+        {
+            DataRowView dbr = (DataRowView)e.Item.DataItem;
+            Repeater repeater_menu_multi = (Repeater)e.Item.FindControl("repeater_menu_multi");
+            HtmlGenericControl ml = (HtmlGenericControl)e.Item.FindControl("ml");
+            HtmlGenericControl mml = (HtmlGenericControl)e.Item.FindControl("mml");
+            int id_menu = Convert.ToInt32(DataBinder.Eval(dbr, "id_menu"));
+            int total_menu = TableMenu(id_menu).Rows.Count;
+            ml.Visible = total_menu == 0;
+            mml.Visible = total_menu > 0;
+            if (total_menu > 0)
+            {
+                try
+                {
+                    DataTable dt_menu = TableMenu(id_menu);
+                    repeater_menu_multi.DataSource = dt_menu;
+                    repeater_menu_multi.DataBind();
+                }
+                catch (Exception ex)
+                {
+                    Toast.Error("Error al cargar menus. " + ex.Message, this.Page);
+                }
+            }
+
+        }
+
+        private void CargarMenu()
+        {
+            try
+            {
+                DataTable dt_menu = TableMenu(0);
+                repeat_menu.DataSource = dt_menu;
+                repeat_menu.DataBind();
+            }
+            catch (Exception ex)
+            {
+                Toast.Error("Error al cargar menus. " + ex.Message, this.Page);
+            }
+        }
 
         private string EditarUsuario(int id_usuario, string usuario, string contraseña, int id_uperfil)
         {

@@ -28,7 +28,6 @@ namespace presentacion
 
                 Boolean cliente = Convert.ToBoolean(Session["cliente"]);
                 nvoproyect.Visible = !cliente;
-                Menu("");
             }
            // div_usuarios.Visible = Convert.ToBoolean(Session["administrador"]);
         }

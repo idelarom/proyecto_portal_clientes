@@ -166,7 +166,7 @@ namespace presentacion
                     Employee entidad = new Employee();
                     entidad.Usuario_Red = username.Trim();
                     EmpleadosCOM empleados = new EmpleadosCOM();
-                    DataTable dt = empleados.GetLogin(entidad);
+                    DataTable dt = empleados.GetLogin(username);
                     if (isValid && dt.Rows.Count > 0)
                     {
                         DataRow row = dt.Rows[0];
