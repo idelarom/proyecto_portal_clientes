@@ -294,7 +294,7 @@ namespace negocio.Componentes
                 bool exists = false;
                 ProyectosCOM proyectos = new ProyectosCOM();
                 DataTable ListadoEmpleadoProyecto = proyectos.ListadoEmpleadoProyecto(entidad.id_proyecto).Tables[0];
-                DataTable dt_filter = ListadoEmpleadoProyecto.Select("no_ = "+entidad.no_+"").CopyToDataTable().Rows.Count > 0? 
+                DataTable dt_filter = ListadoEmpleadoProyecto.Select("no_ = "+entidad.no_+"").Length > 0? 
                                                                                 ListadoEmpleadoProyecto.Select("no_ = " + entidad.no_ + "").CopyToDataTable()
                                                                                 : new DataTable();
                 if (dt_tareas.Rows.Count > 0)
